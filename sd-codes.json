@@ -1,3 +1,6 @@
 {
-  "OK": "OK"
+  "log-types": {
+    "ERROR": "ERROR",
+    "INFO": "INFO"
+  }
 }

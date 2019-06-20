@@ -31,6 +31,6 @@
     "thumbnail": "/home/hamit/sd_storage/thumbnail"
   },
   "codes": {
-    "path": "/etc/scene-detector/sd-codes.json"
+    "path": "/home/hamit/projects/js/sd-web-api/sd-codes.json"
   }
 }
