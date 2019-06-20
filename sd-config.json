@@ -1,0 +1,36 @@
+{
+  "cv-api": {
+    "host": "localhost",
+    "port": 8001,
+    "endpoint": {
+      "object-detection": {
+        "command": {
+          "extract-video-metadata": "/extract-video-metadata",
+          "terminate-object-detection": "/terminate-object-detection",
+          "start-object-detection": "/start-object-detection"
+        },
+        "feedback": {
+          "termination-information-endpoint": "/object-detection-termination",
+          "progress-endpoint": "/object-detection-progress"
+        }
+      }
+    }
+  },
+  "web-api": {
+    "host": "localhost",
+    "port": 3000
+  },
+  "mongo": {
+    "user": "sdadmin",
+    "password": "root",
+    "host": "localhost",
+    "name": "sd"
+  },
+  "storage": {
+    "video": "/home/hamit/sd_storage/videos",
+    "thumbnail": "/home/hamit/sd_storage/thumbnail"
+  },
+  "codes": {
+    "path": "/etc/scene-detector/sd-codes.json"
+  }
+}
