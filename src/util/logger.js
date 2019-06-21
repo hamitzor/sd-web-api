@@ -11,17 +11,17 @@ class Logger {
     return new Date()
   }
 
-  async _log(message, type) {
+  async _log(message, type, stack) {
     await model.connect()
-    model.db.collection(this._colName).insertOne({ date: this._now(), message, type })
+    model.db.collection(this._colName).insertOne({ date: this._now(), message, stack, type })
   }
 
-  logError(message) {
-    this._log(message, codes["log-types"]["ERROR"])
+  logError(message, stack) {
+    this._log(message, codes.log_type.ERROR, stack)
   }
 
   logInfo(message) {
-    this._log(message, codes["log-types"]["INFO"])
+    this._log(message, codes.log_type.INFO)
   }
 
 }

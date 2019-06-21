@@ -4,9 +4,9 @@
 
 
 export default class Controller {
-  _send = (res, status, data) => {
+  _send = (res, status, payload, _links = {}) => {
     if (!res.headersSent) {
-      res.json({ status, data }).end()
+      res.json({ status, payload, _links }).end()
     }
   }
 }

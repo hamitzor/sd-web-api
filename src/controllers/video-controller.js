@@ -2,102 +2,99 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-import Logger from "../util/logger"
-import fetchConfig from "../util/config-fetcher"
 import Controller from "./controller"
-import codes from "../util/status-codes"
 import validator from "validator"
-import videoModel from "../models/video-model"
-import { spawn } from "child_process"
 import videoUploader from "../util/video-uploader"
 import multer from "multer"
-import eqfStatusCodes from "../util/eqf-status-codes"
+import logger from "../util/logger"
+import model from "../models/model"
+import codes from "../util/codes-loader"
+import { ObjectId } from "mongodb"
+import config from "../util/config-loader"
+import fetch from "cross-fetch"
+import assert from "assert"
+import formatRoute from "../util/format-route"
 
 
 class VideoController extends Controller {
 
-  constructor() {
-    super()
-    this._logger = new Logger(fetchConfig("logging:directory:video"))
-  }
-
   getVideo = async (req, res) => {
     const { videoId } = req.params
-    /*Validation*/
+
     try {
       if (!videoId) { throw new Error("Invalid videoId") }
-      if (!validator.isInt(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
     } catch (err) {
-      this._send(res, codes.BAD_REQUEST, { message: err.message })
+      this._send(res, codes.web_api_status.BAD_REQUEST, { message: err.message })
       return
     }
-    /*Validation*/
 
     try {
-      const video = (await videoModel.fetchById(videoId))[0][0]
+      await model.connect()
+      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
 
       if (video) {
-        this._send(res, codes.OK, { video })
+        this._send(res, codes.web_api_status.OK, video)
       }
       else {
-        this._send(res, codes.NOT_FOUND)
+        this._send(res, codes.web_api_status.NOT_FOUND)
       }
     } catch (err) {
-      this._send(res, codes.INTERNAL_SERVER_ERROR)
-      this._logger.error(err)
+      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+      logger.logError(err.message)
     }
 
   }
 
   getVideos = async (req, res) => {
     try {
-      const videos = (await videoModel.fetchAll())[0]
-
-      this._send(res, codes.OK, { videos })
+      await model.connect()
+      const videos = await model.db.collection("videos").find().toArray()
+      this._send(res, codes.web_api_status.OK, videos)
 
     } catch (err) {
-      this._send(res, codes.INTERNAL_SERVER_ERROR)
-      this._logger.error(err)
+      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+      logger.logError(err.message)
     }
   }
 
   deleteVideo = async (req, res) => {
     const { videoId } = req.params
-    /*Validation*/
     try {
       if (!videoId) { throw new Error("Invalid videoId") }
-      if (!validator.isInt(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
     } catch (err) {
-      this._send(res, codes.BAD_REQUEST, { message: err.message })
+      this._send(res, codes.web_api_status.BAD_REQUEST, { message: err.message })
       return
     }
-    /*Validation*/
 
     try {
-      const deleteInfo = (await videoModel.deleteById(videoId))[0]
+      await model.connect()
 
-      const affectedRows = deleteInfo.affectedRows
+      const deleteInfo = await model.db.collection("videos").deleteOne({ _id: ObjectId(videoId) })
 
-      if (affectedRows === 1) {
-        this._send(res, codes.OK)
+      const deletedCount = deleteInfo.deletedCount
+
+      if (deletedCount === 1) {
+        this._send(res, codes.web_api_status.OK)
       }
       else {
-        this._send(res, codes.NOT_FOUND)
+        this._send(res, codes.web_api_status.NOT_FOUND)
       }
     } catch (err) {
-      this._send(res, codes.INTERNAL_SERVER_ERROR)
-      this._logger.error(err)
+      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+      logger.logError(err.message)
     }
   }
 
   postVideo = (req, res) => {
     videoUploader(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
-        this._logger.error(err)
-        this._send(res, codes.BAD_REQUEST)
+        logger.logError(err.message)
+        this._send(res, codes.web_api_status.BAD_REQUEST)
       } else if (err) {
-        this._logger.error(err)
-        this._send(res, codes.INTERNAL_SERVER_ERROR)
+        logger.logError(err.message)
+        this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
       }
       else {
         try {
@@ -105,74 +102,61 @@ class VideoController extends Controller {
 
           let { title } = req.body
 
-          /*Validation*/
           try {
             if (!videoFile) { throw new Error("Invalid videoFile") }
             if (!title) { throw new Error("Invalid title") }
             if (!title.trim()) { throw new Error("Invalid title") }
           } catch (err) {
-            this._send(res, codes.BAD_REQUEST, { message: err.message })
+            this._send(metadata, codes.web_api_status.BAD_REQUEST, { message: err.message })
             return
           }
-          /*Validation*/
 
-          const thumbnailDirectory = fetchConfig("upload-directory:thumbnail")
+          const filename = videoFile.filename
 
-          const argsList = ["-m", "packages.main_scripts.extract_meta_data", videoFile.path, thumbnailDirectory]
+          await model.connect()
+          const insertInfo = await model.db.collection("videos").insertOne({ filename, date: new Date() })
+          const id = insertInfo.insertedId
 
-          const env = { PYTHONPATH: fetchConfig("module-path:helper") }
+          const endpoint = "http://" + config.cv_api.host + ":" + config.cv_api.port + formatRoute(config.cv_api.route.object_detection.command.extract_video_metadata, { video_id: id })
 
-          const process = spawn("python", argsList, { env })
+          const metadata = await (await fetch(endpoint)).json()
 
-          process.stdout.on("data", async (data) => {
-            try {
-              const metaData = JSON.parse(data.toString())
-
-              const video = {
-                title: title,
-                length: metaData.length,
-                extension: videoFile.filename.split(".").pop(),
-                name: videoFile.filename,
-                size: metaData.size,
-                path: videoFile.path,
-                fps: metaData.fps,
-                frame_count: metaData.frame_count,
-                width: metaData.width,
-                height: metaData.height,
-                thumbnail: `thumbnail/${metaData.thumbnail}`,
-                eqf_status: eqfStatusCodes.NOT_STARTED
-              }
-
-              const saveInfo = (await videoModel.save(video))[0]
-
-              const insertId = saveInfo.insertId
-
-              if (insertId) {
-                this._send(res, codes.OK)
-              }
-              else {
-                this._send(res, codes.NOT_FOUND)
-              }
-            } catch (err) {
-              this._logger.error(err)
-              this._send(res, codes.INTERNAL_SERVER_ERROR)
+          if (metadata.status === codes.web_api_status.OK) {
+            const video = {
+              title: title,
+              length: metadata.payload.length,
+              extension: filename.split(".").pop(),
+              name: filename,
+              size: metadata.payload.size,
+              fps: metadata.payload.fps,
+              frame_count: metadata.payload.frame_count,
+              width: metadata.payload.width,
+              height: metadata.payload.height,
+              thumbnail: metadata.payload.thumbnail,
+              object_detection_status: codes.video_process_status.NOT_STARTED,
+              object_detection_progress: 0
             }
-          })
-          /*
-              Add Anomaly Request on Exit
-          */
-          process.stderr.on("data", (data) => {
-            this._send(res, codes.INTERNAL_SERVER_ERROR)
-            this._logger.error(new Error(data.toString()))
-          })
+
+            const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(id) }, { $set: video })
+
+            assert.equal(1, updateInfo.matchedCount)
+            assert.equal(1, updateInfo.modifiedCount)
+
+            this._send(res, codes.web_api_status.OK, { videoId: id }, { self: req.originalUrl })
+          }
+          else {
+            logger.logError(err.message, err.stack)
+            this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+          }
         }
         catch (err) {
-          this._logger.error(err)
-          this._send(res, codes.INTERNAL_SERVER_ERROR)
+          logger.logError(err.message, err.stack)
+          this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
         }
       }
     })
   }
+
 }
 
 export default (new VideoController)

@@ -5,28 +5,18 @@
 
 import "core-js/stable"
 import "regenerator-runtime/runtime"
-import model from "./models/model"
-import logger from "./util/logger"
-
-
-logger.logError("This is a web error.")
-
-process.exit(0)
-/**
- *
- *
- * import express from "express"
+import videoRouter from "./routers/video-router"
+import { urlencoded } from "body-parser"
+import express from "express"
 import config from "./util/config-loader"
 
 
 const app = express()
 
-const port = config["web-api"]["port"]
-const host = config["web-api"]["host"]
+const port = config.web_api.port
+const host = config.web_api.host
 const backlog = () => console.log(`Web API is online at ${host}:${port}`)
 
-
+app.use(config.web_api.route.video.sub_route, urlencoded({ extended: true }), videoRouter)
 
 app.listen(port, host, backlog)
- */
-

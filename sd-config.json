@@ -1,24 +1,34 @@
 {
-  "cv-api": {
+  "cv_api": {
     "host": "localhost",
     "port": 8001,
-    "endpoint": {
-      "object-detection": {
+    "route": {
+      "object_detection": {
         "command": {
-          "extract-video-metadata": "/extract-video-metadata",
-          "terminate-object-detection": "/terminate-object-detection",
-          "start-object-detection": "/start-object-detection"
+          "extract_video_metadata": "/extract-video-metadata/<video_id>/",
+          "terminate_object_detection": "/terminate-object-detection/<operation_id>/",
+          "start_object_detection": "/start-object-detection/<video_id>/"
         },
         "feedback": {
-          "termination-information-endpoint": "/object-detection-termination",
-          "progress-endpoint": "/object-detection-progress"
+          "termination_information": "/object-detection-termination/<operation_id>/<status>/",
+          "progress": "/object-detection-progress/<operation_id>/<progress>/"
         }
       }
     }
   },
-  "web-api": {
+  "web_api": {
     "host": "localhost",
-    "port": 3000
+    "port": 3000,
+    "route": {
+      "video": {
+        "sub_route": "/video",
+        "get": "/<video_id>/",
+        "get_all": "/",
+        "post": "/",
+        "delete": "/<video_id>/",
+        "put": "/<video_id>/"
+      }
+    }
   },
   "mongo": {
     "user": "sdadmin",
