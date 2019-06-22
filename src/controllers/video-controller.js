@@ -3,29 +3,60 @@
  */
 
 import Controller from "./controller"
-import validator from "validator"
 import videoUploader from "../util/video-uploader"
 import multer from "multer"
 import logger from "../util/logger"
 import model from "../models/model"
-import codes from "../util/codes-loader"
 import { ObjectId } from "mongodb"
 import config from "../util/config-loader"
 import fetch from "cross-fetch"
 import assert from "assert"
 import formatRoute from "../util/format-route"
+import { webAddress, cvAddress } from "../util/address"
+import {
+  CV_STATUS_NOT_STARTED,
+  CV_STATUS_STARTED,
+  WEB_STATUS_BAD_REQUEST,
+  WEB_STATUS_INTERNAL_SERVER_ERROR,
+  WEB_STATUS_NOT_FOUND,
+  WEB_STATUS_OK
+} from "../util/status-codes"
 
+
+const videoRouteInfo = config.web_api.route.video
+
+const videoUrl = (name, id) => webAddress + videoRouteInfo.sub_route +
+  formatRoute(videoRouteInfo[name], id !== undefined ? { video_id: id } : undefined)
+
+const objectDetectionRouteInfo = config.web_api.route.object_detection
+
+const objectDetectionUrl = (name, id) => webAddress + objectDetectionRouteInfo.sub_route +
+  formatRoute(objectDetectionRouteInfo[name], id !== undefined ? { video_id: id } : undefined)
+
+const cvObjectDetectionRouteInfo = config.cv_api.route.object_detection
+
+const cvObjectDetectionUrl = (name, mapping) => cvAddress + cvObjectDetectionRouteInfo.sub_route +
+  formatRoute(cvObjectDetectionRouteInfo[name], mapping)
+
+
+const generateLinks = (id) => {
+  return {
+    delete: id === undefined ? undefined : videoUrl("delete", id),
+    update: id === undefined ? undefined : videoUrl("put", id),
+    add: videoUrl("post"),
+    videos: videoUrl("get_all")
+  }
+}
 
 class VideoController extends Controller {
 
-  getVideo = async (req, res) => {
+  get = async (req, res) => {
     const { videoId } = req.params
 
     try {
-      if (!videoId) { throw new Error("Invalid videoId") }
       if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
     } catch (err) {
-      this._send(res, codes.web_api_status.BAD_REQUEST, { message: err.message })
+      this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
     }
 
@@ -34,37 +65,57 @@ class VideoController extends Controller {
       const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
 
       if (video) {
-        this._send(res, codes.web_api_status.OK, video)
+        const _links = {
+          self: videoUrl("get", videoId),
+          "start-object-detection": objectDetectionUrl("start", videoId),
+          "cancel-object-detection": objectDetectionUrl("cancel", videoId),
+          ...generateLinks(videoId)
+        }
+
+        this._send(res, WEB_STATUS_OK, video, _links)
       }
       else {
-        this._send(res, codes.web_api_status.NOT_FOUND)
+        this._send(res, WEB_STATUS_NOT_FOUND)
       }
     } catch (err) {
-      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message)
+      this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
+      logger.logError(err.message, err.stack)
     }
-
   }
 
-  getVideos = async (req, res) => {
+  getAll = async (req, res) => {
     try {
       await model.connect()
-      const videos = await model.db.collection("videos").find().toArray()
-      this._send(res, codes.web_api_status.OK, videos)
+      let videos = await model.db.collection("videos").find().toArray()
+      videos = videos.map(video => ({
+        ...video,
+        _links: {
+          self: videoUrl("get", video._id),
+          "start-object-detection": objectDetectionUrl("start", video._id),
+          "cancel-object-detection": objectDetectionUrl("cancel", video._id),
+          ...generateLinks(video._id)
+        }
+      }))
+
+      const _links = {
+        self: videoUrl("get_all"),
+        ...generateLinks()
+      }
+
+      this._send(res, WEB_STATUS_OK, videos, _links)
 
     } catch (err) {
-      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message)
+      this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
+      logger.logError(err.message, err.stack)
     }
   }
 
-  deleteVideo = async (req, res) => {
+  delete = async (req, res) => {
     const { videoId } = req.params
     try {
-      if (!videoId) { throw new Error("Invalid videoId") }
       if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
     } catch (err) {
-      this._send(res, codes.web_api_status.BAD_REQUEST, { message: err.message })
+      this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
     }
 
@@ -76,25 +127,31 @@ class VideoController extends Controller {
       const deletedCount = deleteInfo.deletedCount
 
       if (deletedCount === 1) {
-        this._send(res, codes.web_api_status.OK)
+
+        const _links = {
+          self: videoUrl("delete", videoId),
+          ...generateLinks()
+        }
+
+        this._send(res, WEB_STATUS_OK, {}, _links)
       }
       else {
-        this._send(res, codes.web_api_status.NOT_FOUND)
+        this._send(res, WEB_STATUS_NOT_FOUND)
       }
     } catch (err) {
-      this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message)
+      this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
+      logger.logError(err.message, err.stack)
     }
   }
 
-  postVideo = (req, res) => {
+  post = (req, res) => {
     videoUploader(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
-        logger.logError(err.message)
-        this._send(res, codes.web_api_status.BAD_REQUEST)
+        logger.logError(err.message, err.stack)
+        this._send(res, WEB_STATUS_BAD_REQUEST)
       } else if (err) {
-        logger.logError(err.message)
-        this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+        logger.logError(err.message, err.stack)
+        this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
       }
       else {
         try {
@@ -107,7 +164,7 @@ class VideoController extends Controller {
             if (!title) { throw new Error("Invalid title") }
             if (!title.trim()) { throw new Error("Invalid title") }
           } catch (err) {
-            this._send(metadata, codes.web_api_status.BAD_REQUEST, { message: err.message })
+            this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
             return
           }
 
@@ -117,46 +174,109 @@ class VideoController extends Controller {
           const insertInfo = await model.db.collection("videos").insertOne({ filename, date: new Date() })
           const id = insertInfo.insertedId
 
-          const endpoint = "http://" + config.cv_api.host + ":" + config.cv_api.port + formatRoute(config.cv_api.route.object_detection.command.extract_video_metadata, { video_id: id })
+          const endpoint = cvObjectDetectionUrl("extract_video_metadata", { video_id: id })
 
           const metadata = await (await fetch(endpoint)).json()
 
-          if (metadata.status === codes.web_api_status.OK) {
-            const video = {
-              title: title,
-              length: metadata.payload.length,
-              extension: filename.split(".").pop(),
-              name: filename,
-              size: metadata.payload.size,
-              fps: metadata.payload.fps,
-              frame_count: metadata.payload.frame_count,
-              width: metadata.payload.width,
-              height: metadata.payload.height,
-              thumbnail: metadata.payload.thumbnail,
-              object_detection_status: codes.video_process_status.NOT_STARTED,
-              object_detection_progress: 0
-            }
-
-            const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(id) }, { $set: video })
-
-            assert.equal(1, updateInfo.matchedCount)
-            assert.equal(1, updateInfo.modifiedCount)
-
-            this._send(res, codes.web_api_status.OK, { videoId: id }, { self: req.originalUrl })
+          if (metadata.status !== WEB_STATUS_OK) {
+            throw Error("CV module failed during metadata extraction")
           }
-          else {
-            logger.logError(err.message, err.stack)
-            this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+
+          const video = {
+            title: title,
+            length: metadata.payload.length,
+            extension: filename.split(".").pop(),
+            name: filename,
+            size: metadata.payload.size,
+            fps: metadata.payload.fps,
+            frame_count: metadata.payload.frame_count,
+            width: metadata.payload.width,
+            height: metadata.payload.height,
+            thumbnail: metadata.payload.thumbnail,
+            object_detection_status: CV_STATUS_NOT_STARTED,
+            object_detection_progress: 0
           }
+
+          const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(id) }, { $set: video })
+
+          assert.equal(1, updateInfo.matchedCount)
+          assert.equal(1, updateInfo.modifiedCount)
+
+          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) })
+
+          const _links = {
+            self: videoUrl("get", id),
+            "start-object-detection": objectDetectionUrl("start", id),
+            "cancel-object-detection": objectDetectionUrl("cancel", id),
+            ...generateLinks(id)
+          }
+
+          this._send(res, WEB_STATUS_OK, uploadedVideo, _links)
+
         }
         catch (err) {
           logger.logError(err.message, err.stack)
-          this._send(res, codes.web_api_status.INTERNAL_SERVER_ERROR)
+          this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
         }
       }
     })
   }
 
+  put = (req, res) => {
+    (multer().none())(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        logger.logError(err.message, err.stack)
+        this._send(res, WEB_STATUS_BAD_REQUEST)
+      } else if (err) {
+        logger.logError(err.message, err.stack)
+        this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
+      }
+      else {
+
+        const { videoId } = req.params
+        let { title } = req.body
+
+
+        try {
+          if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
+          if (title === "") { throw new Error("Invalid title") }
+          if (title !== undefined && !title.trim()) { throw new Error("Invalid title") }
+        } catch (err) {
+          this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
+          return
+        }
+
+        try {
+          await model.connect()
+          const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(videoId) }, { $set: { title } })
+
+          if (updateInfo.matchedCount === 0) {
+            this._send(res, WEB_STATUS_BAD_REQUEST, { message: "Invalid videoId" })
+            return
+          }
+
+          if (updateInfo.modifiedCount === 0) {
+            throw new Error("Video with id " + videoId + " could not be updated.")
+          }
+
+          const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
+
+          const _links = {
+            self: videoUrl("get", videoId),
+            "start-object-detection": objectDetectionUrl("start", videoId),
+            "cancel-object-detection": objectDetectionUrl("cancel", videoId),
+            ...generateLinks(videoId)
+          }
+
+          this._send(res, WEB_STATUS_OK, video, _links)
+
+        } catch (err) {
+          this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
+          logger.logError(err.message, err.stack)
+        }
+      }
+    })
+  }
 }
 
 export default (new VideoController)

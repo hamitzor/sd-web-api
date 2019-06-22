@@ -1,4 +1,8 @@
 const formatRoute = (literal, mapping, delimiters = { left: "<", right: ">" }) => {
+  if (mapping === undefined) {
+    return literal
+  }
+
   let pieces = literal.split("/")
 
   pieces.shift()

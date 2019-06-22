@@ -3,16 +3,18 @@
     "ERROR": "ERROR",
     "INFO": "INFO"
   },
-  "web_api_status": {
+  "web_status": {
     "OK": "OK",
     "INTERNAL_SERVER_ERROR": "INTERNAL_SERVER_ERROR",
     "BAD_REQUEST": "BAD_REQUEST",
-    "NOT_FOUND": "NOT_FOUND"
+    "NOT_FOUND": "NOT_FOUND",
+    "FORBIDDEN": "FORBIDDEN"
   },
-  "video_process_status": {
+  "cv_status": {
     "NOT_STARTED": "NOT_STARTED",
     "STARTED": "STARTED",
-    "INTERRUPTED": "INTERRUPTED",
-    "FAILED": "FAILED"
+    "CANCELED": "CANCELED",
+    "FAILED": "FAILED",
+    "COMPLETED": "COMPLETED"
   }
 }

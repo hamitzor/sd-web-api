@@ -5,7 +5,7 @@ import crypto from "crypto"
 
 const storage = multer.diskStorage({
   destination: function (_, __, cb) {
-    cb(null, config.storage.video)
+    cb(null, config.storage.videos)
   },
   filename: function (_, file, cb) {
     const id = crypto.randomBytes(20).toString('hex')

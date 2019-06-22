@@ -4,15 +4,10 @@
     "port": 8001,
     "route": {
       "object_detection": {
-        "command": {
-          "extract_video_metadata": "/extract-video-metadata/<video_id>/",
-          "terminate_object_detection": "/terminate-object-detection/<operation_id>/",
-          "start_object_detection": "/start-object-detection/<video_id>/"
-        },
-        "feedback": {
-          "termination_information": "/object-detection-termination/<operation_id>/<status>/",
-          "progress": "/object-detection-progress/<operation_id>/<progress>/"
-        }
+        "sub_route": "",
+        "extract_video_metadata": "/extract-video-metadata/<video_id>/",
+        "cancel_object_detection": "/cancel-object-detection/<video_id>/",
+        "start_object_detection": "/start-object-detection/<video_id>/"
       }
     }
   },
@@ -27,6 +22,25 @@
         "post": "/",
         "delete": "/<video_id>/",
         "put": "/<video_id>/"
+      },
+      "object_detection": {
+        "sub_route": "/object-detection",
+        "start": "/start/<video_id>/",
+        "cancel": "/cancel/<video_id>/"
+      },
+      "cv_feedback": {
+        "sub_route": "/cv-feedback",
+        "object_detection_status": "/object-detection-status/<video_id>/<status>/",
+        "object_detection_progress": "/object-detection-progress/<video_id>/<progress>/"
+      }
+    },
+    "ws_route": {
+      "video": {
+        "upload_progress": "/video-upload-progress/<upload_id>/"
+      },
+      "object_detection": {
+        "watch_status": "/object-detection-watch-status/<video_id>/",
+        "watch_progress": "/object-detection-watch-progress/<video_id>/"
       }
     }
   },
@@ -37,8 +51,8 @@
     "name": "sd"
   },
   "storage": {
-    "video": "/home/hamit/sd_storage/videos",
-    "thumbnail": "/home/hamit/sd_storage/thumbnail"
+    "videos": "/home/hamit/sd_storage/videos",
+    "thumbnails": "/home/hamit/sd_storage/thumbnails"
   },
   "codes": {
     "path": "/home/hamit/projects/js/sd-web-api/sd-codes.json"
