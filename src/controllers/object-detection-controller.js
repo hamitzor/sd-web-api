@@ -2,16 +2,16 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-import Controller from "./controller"
-import logger from "../util/logger"
-import model from "../models/model"
-import { ObjectId } from "mongodb"
-import config from "../util/config-loader"
-import fetch from "cross-fetch"
-import formatRoute from "../util/format-route"
-import { webAddress, cvAddress } from "../util/address"
-import crypto from "crypto"
-import {
+const Controller = require("./controller")
+const logger = require("../util/logger")
+const model = require("../models/model")
+const { ObjectId } = require("mongodb")
+const config = require("../util/config-loader")
+const fetch = require("cross-fetch")
+const formatRoute = require("../util/format-route")
+const { webAddress, cvAddress } = require("../util/address")
+const crypto = require("crypto")
+const {
   CV_STATUS_NOT_STARTED,
   CV_STATUS_CANCELED,
   CV_STATUS_FAILED,
@@ -21,7 +21,7 @@ import {
   WEB_STATUS_FORBIDDEN,
   WEB_STATUS_OK,
   CV_STATUS_STARTED
-} from "../util/status-codes"
+} = require("../util/status-codes")
 
 
 
@@ -110,4 +110,4 @@ class ObjectDetectionController extends Controller {
   }
 }
 
-export default (new ObjectDetectionController)
+module.exports = (new ObjectDetectionController)

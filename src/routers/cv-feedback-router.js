@@ -1,7 +1,7 @@
-import express from "express"
-import cvFeedbackController from "../controllers/cv-feedback-controller"
-import config from "../util/config-loader"
-import formatRoute from "../util/format-route"
+const express = require("express")
+const cvFeedbackController = require("../controllers/cv-feedback-controller")
+const config = require("../util/config-loader")
+const formatRoute = require("../util/format-route")
 
 const cvFeedbackRouter = express.Router()
 
@@ -11,4 +11,4 @@ cvFeedbackRouter.get(formatRoute(config.web_api.route.cv_feedback.object_detecti
 cvFeedbackRouter.get(formatRoute(config.web_api.route.cv_feedback.object_detection_progress,
   { video_id: ":videoId", progress: ":progress" }), cvFeedbackController.objectDetectionProgress)
 
-export default cvFeedbackRouter
+module.exports = cvFeedbackRouter

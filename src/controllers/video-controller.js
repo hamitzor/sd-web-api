@@ -2,25 +2,25 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-import Controller from "./controller"
-import videoUploader from "../util/video-uploader"
-import multer from "multer"
-import logger from "../util/logger"
-import model from "../models/model"
-import { ObjectId } from "mongodb"
-import config from "../util/config-loader"
-import fetch from "cross-fetch"
-import assert from "assert"
-import formatRoute from "../util/format-route"
-import { webAddress, cvAddress } from "../util/address"
-import {
+const Controller = require("./controller")
+const videoUploader = require("../util/video-uploader")
+const multer = require("multer")
+const logger = require("../util/logger")
+const model = require("../models/model")
+const { ObjectId } = require("mongodb")
+const config = require("../util/config-loader")
+const fetch = require("cross-fetch")
+const assert = require("assert")
+const formatRoute = require("../util/format-route")
+const { webAddress, cvAddress } = require("../util/address")
+const {
   CV_STATUS_NOT_STARTED,
   CV_STATUS_STARTED,
   WEB_STATUS_BAD_REQUEST,
   WEB_STATUS_INTERNAL_SERVER_ERROR,
   WEB_STATUS_NOT_FOUND,
   WEB_STATUS_OK
-} from "../util/status-codes"
+} = require("../util/status-codes")
 
 
 const videoRouteInfo = config.web_api.route.video
@@ -279,4 +279,4 @@ class VideoController extends Controller {
   }
 }
 
-export default (new VideoController)
+module.exports = (new VideoController)

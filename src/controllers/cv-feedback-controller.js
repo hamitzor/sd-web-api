@@ -2,26 +2,26 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-import Controller from "./controller"
-import logger from "../util/logger"
-import model from "../models/model"
-import { ObjectId } from "mongodb"
-import config from "../util/config-loader"
-import fetch from "cross-fetch"
-import formatRoute from "../util/format-route"
-import { webAddress, cvAddress } from "../util/address"
-import globalEe from "../global-ee"
-import {
+const Controller = require("./controller")
+const logger = require("../util/logger")
+const model = require("../models/model")
+const { ObjectId } = require("mongodb")
+const config = require("../util/config-loader")
+const fetch = require("cross-fetch")
+const formatRoute = require("../util/format-route")
+const { webAddress, cvAddress } = require("../util/address")
+const globalEe = require("../global-ee")
+const {
   CV_STATUS_NOT_STARTED,
   WEB_STATUS_BAD_REQUEST,
   WEB_STATUS_INTERNAL_SERVER_ERROR,
   WEB_STATUS_NOT_FOUND,
   WEB_STATUS_OK
-} from "../util/status-codes"
-import {
+} = require("../util/status-codes")
+const {
   OBJECT_DETECTION_STATUS_UPDATED,
   OBJECT_DETECTION_PROGRESS_CHANGED
-} from "../events"
+} = require("../events")
 
 
 const videoRouteInfo = config.web_api.route.video
@@ -57,4 +57,4 @@ class CvFeedbackController extends Controller {
 
 }
 
-export default (new CvFeedbackController)
+module.exports = (new CvFeedbackController)

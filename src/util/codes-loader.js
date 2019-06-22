@@ -1,8 +1,8 @@
-import fs from "fs"
-import config from "./config-loader"
+const fs = require("fs")
+const config = require("./config-loader")
 
 const codesPath = config["codes"]["path"]
 const content = fs.readFileSync(codesPath)
 const codes = JSON.parse(content)
 
-export default codes
+module.exports = codes

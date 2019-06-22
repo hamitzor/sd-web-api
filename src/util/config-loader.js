@@ -1,8 +1,7 @@
-import fs from "fs"
-import minimist from "minimist"
+const fs = require("fs")
+const minimist = require("minimist")
 
 const argv = minimist(process.argv.slice(2))
-
 
 const path = argv["app-config"]
 
@@ -14,4 +13,4 @@ if (!path) {
 const content = fs.readFileSync(path)
 const config = JSON.parse(content)
 
-export default config
+module.exports = config

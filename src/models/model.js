@@ -1,5 +1,5 @@
-import mongodb from "mongodb"
-import config from "../util/config-loader"
+const mongodb = require("mongodb")
+const config = require("../util/config-loader")
 
 class Model {
 
@@ -31,4 +31,4 @@ class Model {
 
 const model = new Model()
 
-export default model
+module.exports = model

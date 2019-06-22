@@ -1,5 +1,5 @@
-import model from "../models/model"
-import codes from "./codes-loader"
+const model = require("../models/model")
+const codes = require("./codes-loader")
 
 
 class Logger {
@@ -28,4 +28,4 @@ class Logger {
 
 const logger = new Logger()
 
-export default logger
+module.exports = logger

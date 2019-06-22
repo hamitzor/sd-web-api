@@ -1,7 +1,7 @@
-import express from "express"
-import objectDetectionController from "../controllers/object-detection-controller"
-import config from "../util/config-loader"
-import formatRoute from "../util/format-route"
+const express = require("express")
+const objectDetectionController = require("../controllers/object-detection-controller")
+const config = require("../util/config-loader")
+const formatRoute = require("../util/format-route")
 
 const objectDetectionRouter = express.Router()
 
@@ -11,4 +11,4 @@ objectDetectionRouter.get(formatRoute(config.web_api.route.object_detection.star
 objectDetectionRouter.get(formatRoute(config.web_api.route.object_detection.cancel,
   { video_id: ":videoId" }), objectDetectionController.cancel)
 
-export default objectDetectionRouter
+module.exports = objectDetectionRouter

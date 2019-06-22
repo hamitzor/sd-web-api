@@ -23,4 +23,4 @@ const formatRoute = (literal, mapping, delimiters = { left: "<", right: ">" }) =
   return literal
 }
 
-export default formatRoute
+module.exports = formatRoute

@@ -1,5 +1,5 @@
-import { EventEmitter } from "events"
+const { EventEmitter } = require("events")
 
 const globalEe = new EventEmitter()
 
-export default globalEe
+module.exports = globalEe

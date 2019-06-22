@@ -39,8 +39,9 @@
         "upload_progress": "/video-upload-progress/<upload_id>/"
       },
       "object_detection": {
-        "watch_status": "/object-detection-watch-status/<video_id>/",
-        "watch_progress": "/object-detection-watch-progress/<video_id>/"
+        "sub_route": "/object-detection",
+        "watch_status": "/watch-status/<video_id>/",
+        "watch_progress": "/watch-progress/<video_id>/"
       }
     }
   },
