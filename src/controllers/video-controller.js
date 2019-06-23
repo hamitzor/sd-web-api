@@ -193,8 +193,11 @@ class VideoController extends Controller {
             width: metadata.payload.width,
             height: metadata.payload.height,
             thumbnail: metadata.payload.thumbnail,
-            object_detection_status: CV_STATUS_NOT_STARTED,
-            object_detection_progress: 0
+            object_detection: {
+              status: CV_STATUS_NOT_STARTED,
+              progress: 0,
+              detections: []
+            }
           }
 
           const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(id) }, { $set: video })
@@ -202,7 +205,7 @@ class VideoController extends Controller {
           assert.equal(1, updateInfo.matchedCount)
           assert.equal(1, updateInfo.modifiedCount)
 
-          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) })
+          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) }).project({ "object_detection.detections": 0 })
 
           const _links = {
             self: videoUrl("get", id),

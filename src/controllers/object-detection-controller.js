@@ -52,7 +52,7 @@ class ObjectDetectionController extends Controller {
       await model.connect()
       const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
       if (video) {
-        if (isObjectDetectionStatusValid(video.object_detection_status)) {
+        if (isObjectDetectionStatusValid(video.object_detection.status)) {
           const startUrl = cvObjectDetectionUrl("start_object_detection", { video_id: videoId })
           await fetch(startUrl)
           const _links = {
@@ -87,7 +87,7 @@ class ObjectDetectionController extends Controller {
       await model.connect()
       const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
       if (video) {
-        if (video.object_detection_status === CV_STATUS_STARTED) {
+        if (video.object_detection.status === CV_STATUS_STARTED) {
           const cancelUrl = cvObjectDetectionUrl("cancel_object_detection", { video_id: videoId })
           await fetch(cancelUrl)
           const _links = {

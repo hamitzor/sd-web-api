@@ -41,7 +41,7 @@ class CvFeedbackController extends Controller {
     const { videoId, status } = req.params
     await model.connect()
     await model.db.collection("videos")
-      .updateOne({ _id: ObjectId(videoId) }, { $set: { object_detection_status: status } })
+      .updateOne({ _id: ObjectId(videoId) }, { $set: { "object_detection.status": status } })
     globalEe.emit(OBJECT_DETECTION_STATUS_UPDATED, { videoId, status })
     this._send(res, WEB_STATUS_OK)
   }
@@ -50,7 +50,7 @@ class CvFeedbackController extends Controller {
     const { videoId, progress } = req.params
     await model.connect()
     await model.db.collection("videos")
-      .updateOne({ _id: ObjectId(videoId) }, { $set: { object_detection_progress: progress } })
+      .updateOne({ _id: ObjectId(videoId) }, { $set: { "object_detection.progress": progress } })
     globalEe.emit(OBJECT_DETECTION_PROGRESS_CHANGED, { videoId, progress })
     this._send(res, WEB_STATUS_OK)
   }
