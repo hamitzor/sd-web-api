@@ -62,7 +62,7 @@ class VideoController extends Controller {
 
     try {
       await model.connect()
-      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
+      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) }, { projection: { "object_detection.detections": 0 } })
 
       if (video) {
         const _links = {
@@ -86,7 +86,7 @@ class VideoController extends Controller {
   getAll = async (req, res) => {
     try {
       await model.connect()
-      let videos = await model.db.collection("videos").find().toArray()
+      let videos = await model.db.collection("videos").find({}, { projection: { "object_detection.detections": 0 } }).toArray()
       videos = videos.map(video => ({
         ...video,
         _links: {
@@ -205,7 +205,7 @@ class VideoController extends Controller {
           assert.equal(1, updateInfo.matchedCount)
           assert.equal(1, updateInfo.modifiedCount)
 
-          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) }).project({ "object_detection.detections": 0 })
+          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) }, { projection: { "object_detection.detections": 0 } })
 
           const _links = {
             self: videoUrl("get", id),
@@ -262,7 +262,7 @@ class VideoController extends Controller {
             throw new Error("Video with id " + videoId + " could not be updated.")
           }
 
-          const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
+          const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) }, { projection: { "object_detection.detections": 0 } })
 
           const _links = {
             self: videoUrl("get", videoId),
