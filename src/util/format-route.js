@@ -1,13 +1,13 @@
-const formatRoute = (literal, mapping, delimiters = { left: "<", right: ">" }) => {
+const formatRoute = (literal, mapping, delimiters = { left: '<', right: '>' }) => {
   if (mapping === undefined) {
     return literal
   }
 
-  let pieces = literal.split("/")
+  let pieces = literal.split('/')
 
   pieces.shift()
 
-  const arg_pattern = RegExp("^" + delimiters.left + ".+" + delimiters.right + "$")
+  const arg_pattern = RegExp('^' + delimiters.left + '.+' + delimiters.right + '$')
 
   Object.keys(pieces).forEach(key => {
     const piece = pieces[key]

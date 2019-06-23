@@ -1,12 +1,12 @@
-const fs = require("fs")
-const minimist = require("minimist")
+const fs = require('fs')
+const minimist = require('minimist')
 
 const argv = minimist(process.argv.slice(2))
 
-const path = argv["app-config"]
+const path = argv['app-config']
 
 if (!path) {
-  console.error("Configuration file path was not specified.")
+  console.error('Configuration file path was not specified.')
   process.exit(-1)
 }
 

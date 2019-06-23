@@ -1,21 +1,21 @@
-const path = require("path")
+const path = require('path')
 
 
 const coreConfig = {
-  context: path.resolve(__dirname, "src"),
-  entry: "./index",
-  devtool: "source-map",
+  context: path.resolve(__dirname, 'src'),
+  entry: './index',
+  devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.index.js"
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.index.js'
   },
-  target: "node",
+  target: 'node',
   node: {
     __dirname: false
   },
   module: {
     rules: [
-      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
     ]
   }
 }

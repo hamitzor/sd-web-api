@@ -2,24 +2,24 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-require("core-js/stable")
-require("regenerator-runtime/runtime")
-const express = require("express")
+require('core-js/stable')
+require('regenerator-runtime/runtime')
+const express = require('express')
 const app = express()
 require('express-ws')(app)
 
-const videoRouter = require("./routers/video-router")
-const objectDetectionRouter = require("./routers/object-detection-router")
-const objectDetectionWsRouter = require("./routers/object-detection-ws-router")
-const cvFeedbackRouter = require("./routers/cv-feedback-router")
-const { urlencoded } = require("body-parser")
-const config = require("./util/config-loader")
-const globalEe = require("./global-ee")
+const videoRouter = require('./routers/video-router')
+const objectDetectionRouter = require('./routers/object-detection-router')
+const objectDetectionWsRouter = require('./routers/object-detection-ws-router')
+const cvFeedbackRouter = require('./routers/cv-feedback-router')
+const { urlencoded } = require('body-parser')
+const config = require('./util/config-loader')
+const globalEe = require('./global-ee')
 
 const {
   OBJECT_DETECTION_STATUS_UPDATED,
   OBJECT_DETECTION_PROGRESS_CHANGED
-} = require("./events")
+} = require('./events')
 
 globalEe.on(OBJECT_DETECTION_STATUS_UPDATED, data => console.log(data))
 globalEe.on(OBJECT_DETECTION_PROGRESS_CHANGED, data => console.log(data))

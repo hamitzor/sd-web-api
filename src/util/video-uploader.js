@@ -1,6 +1,6 @@
-const multer = require("multer")
-const config = require("./config-loader")
-const crypto = require("crypto")
+const multer = require('multer')
+const config = require('./config-loader')
+const crypto = require('crypto')
 
 
 const storage = multer.diskStorage({
@@ -35,4 +35,4 @@ const videoUploader = multer({
   fileFilter
 })
 
-module.exports = videoUploader.single("videoFile")
+module.exports = videoUploader.single('videoFile')

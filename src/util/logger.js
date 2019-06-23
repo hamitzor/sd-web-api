@@ -1,10 +1,10 @@
-const model = require("../models/model")
-const codes = require("./codes-loader")
+const model = require('../models/model')
+const codes = require('./codes-loader')
 
 
 class Logger {
   constructor() {
-    this._colName = "web_logs"
+    this._colName = 'web_logs'
   }
 
   _now() {

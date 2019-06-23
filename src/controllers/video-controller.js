@@ -2,25 +2,24 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-const Controller = require("./controller")
-const videoUploader = require("../util/video-uploader")
-const multer = require("multer")
-const logger = require("../util/logger")
-const model = require("../models/model")
-const { ObjectId } = require("mongodb")
-const config = require("../util/config-loader")
-const fetch = require("cross-fetch")
-const assert = require("assert")
-const formatRoute = require("../util/format-route")
-const { webAddress, cvAddress } = require("../util/address")
+const Controller = require('./controller')
+const videoUploader = require('../util/video-uploader')
+const multer = require('multer')
+const logger = require('../util/logger')
+const model = require('../models/model')
+const { ObjectId } = require('mongodb')
+const config = require('../util/config-loader')
+const fetch = require('cross-fetch')
+const assert = require('assert')
+const formatRoute = require('../util/format-route')
+const { webAddress, cvAddress } = require('../util/address')
 const {
   CV_STATUS_NOT_STARTED,
-  CV_STATUS_STARTED,
   WEB_STATUS_BAD_REQUEST,
   WEB_STATUS_INTERNAL_SERVER_ERROR,
   WEB_STATUS_NOT_FOUND,
   WEB_STATUS_OK
-} = require("../util/status-codes")
+} = require('../util/status-codes')
 
 
 const videoRouteInfo = config.web_api.route.video
@@ -41,10 +40,10 @@ const cvObjectDetectionUrl = (name, mapping) => cvAddress + cvObjectDetectionRou
 
 const generateLinks = (id) => {
   return {
-    delete: id === undefined ? undefined : videoUrl("delete", id),
-    update: id === undefined ? undefined : videoUrl("put", id),
-    add: videoUrl("post"),
-    videos: videoUrl("get_all")
+    delete: id === undefined ? undefined : videoUrl('delete', id),
+    update: id === undefined ? undefined : videoUrl('put', id),
+    add: videoUrl('post'),
+    videos: videoUrl('get_all')
   }
 }
 
@@ -54,7 +53,7 @@ class VideoController extends Controller {
     const { videoId } = req.params
 
     try {
-      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
     } catch (err) {
       this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
@@ -62,13 +61,13 @@ class VideoController extends Controller {
 
     try {
       await model.connect()
-      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) }, { projection: { "object_detection.detections": 0 } })
+      const video = await model.db.collection('videos').findOne({ _id: ObjectId(videoId) }, { projection: { 'object_detection.detections': 0 } })
 
       if (video) {
         const _links = {
-          self: videoUrl("get", videoId),
-          "start-object-detection": objectDetectionUrl("start", videoId),
-          "cancel-object-detection": objectDetectionUrl("cancel", videoId),
+          self: videoUrl('get', videoId),
+          'start-object-detection': objectDetectionUrl('start', videoId),
+          'cancel-object-detection': objectDetectionUrl('cancel', videoId),
           ...generateLinks(videoId)
         }
 
@@ -86,19 +85,19 @@ class VideoController extends Controller {
   getAll = async (req, res) => {
     try {
       await model.connect()
-      let videos = await model.db.collection("videos").find({}, { projection: { "object_detection.detections": 0 } }).toArray()
+      let videos = await model.db.collection('videos').find({}, { projection: { 'object_detection.detections': 0 } }).toArray()
       videos = videos.map(video => ({
         ...video,
         _links: {
-          self: videoUrl("get", video._id),
-          "start-object-detection": objectDetectionUrl("start", video._id),
-          "cancel-object-detection": objectDetectionUrl("cancel", video._id),
+          self: videoUrl('get', video._id),
+          'start-object-detection': objectDetectionUrl('start', video._id),
+          'cancel-object-detection': objectDetectionUrl('cancel', video._id),
           ...generateLinks(video._id)
         }
       }))
 
       const _links = {
-        self: videoUrl("get_all"),
+        self: videoUrl('get_all'),
         ...generateLinks()
       }
 
@@ -113,7 +112,7 @@ class VideoController extends Controller {
   delete = async (req, res) => {
     const { videoId } = req.params
     try {
-      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
     } catch (err) {
       this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
@@ -122,14 +121,14 @@ class VideoController extends Controller {
     try {
       await model.connect()
 
-      const deleteInfo = await model.db.collection("videos").deleteOne({ _id: ObjectId(videoId) })
+      const deleteInfo = await model.db.collection('videos').deleteOne({ _id: ObjectId(videoId) })
 
       const deletedCount = deleteInfo.deletedCount
 
       if (deletedCount === 1) {
 
         const _links = {
-          self: videoUrl("delete", videoId),
+          self: videoUrl('delete', videoId),
           ...generateLinks()
         }
 
@@ -160,9 +159,9 @@ class VideoController extends Controller {
           let { title } = req.body
 
           try {
-            if (!videoFile) { throw new Error("Invalid videoFile") }
-            if (!title) { throw new Error("Invalid title") }
-            if (!title.trim()) { throw new Error("Invalid title") }
+            if (!videoFile) { throw new Error('Invalid videoFile') }
+            if (!title) { throw new Error('Invalid title') }
+            if (!title.trim()) { throw new Error('Invalid title') }
           } catch (err) {
             this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
             return
@@ -171,21 +170,21 @@ class VideoController extends Controller {
           const filename = videoFile.filename
 
           await model.connect()
-          const insertInfo = await model.db.collection("videos").insertOne({ filename, date: new Date() })
+          const insertInfo = await model.db.collection('videos').insertOne({ filename, date: new Date() })
           const id = insertInfo.insertedId
 
-          const endpoint = cvObjectDetectionUrl("extract_video_metadata", { video_id: id })
+          const endpoint = cvObjectDetectionUrl('extract_video_metadata', { video_id: id })
 
           const metadata = await (await fetch(endpoint)).json()
 
           if (metadata.status !== WEB_STATUS_OK) {
-            throw Error("CV module failed during metadata extraction")
+            throw Error('CV module failed during metadata extraction')
           }
 
           const video = {
             title: title,
             length: metadata.payload.length,
-            extension: filename.split(".").pop(),
+            extension: filename.split('.').pop(),
             name: filename,
             size: metadata.payload.size,
             fps: metadata.payload.fps,
@@ -200,17 +199,17 @@ class VideoController extends Controller {
             }
           }
 
-          const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(id) }, { $set: video })
+          const updateInfo = await model.db.collection('videos').updateOne({ _id: ObjectId(id) }, { $set: video })
 
           assert.equal(1, updateInfo.matchedCount)
           assert.equal(1, updateInfo.modifiedCount)
 
-          const uploadedVideo = await model.db.collection("videos").findOne({ _id: ObjectId(id) }, { projection: { "object_detection.detections": 0 } })
+          const uploadedVideo = await model.db.collection('videos').findOne({ _id: ObjectId(id) }, { projection: { 'object_detection.detections': 0 } })
 
           const _links = {
-            self: videoUrl("get", id),
-            "start-object-detection": objectDetectionUrl("start", id),
-            "cancel-object-detection": objectDetectionUrl("cancel", id),
+            self: videoUrl('get', id),
+            'start-object-detection': objectDetectionUrl('start', id),
+            'cancel-object-detection': objectDetectionUrl('cancel', id),
             ...generateLinks(id)
           }
 
@@ -241,9 +240,9 @@ class VideoController extends Controller {
 
 
         try {
-          if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
-          if (title === "") { throw new Error("Invalid title") }
-          if (title !== undefined && !title.trim()) { throw new Error("Invalid title") }
+          if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
+          if (title === '') { throw new Error('Invalid title') }
+          if (title !== undefined && !title.trim()) { throw new Error('Invalid title') }
         } catch (err) {
           this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
           return
@@ -251,23 +250,23 @@ class VideoController extends Controller {
 
         try {
           await model.connect()
-          const updateInfo = await model.db.collection("videos").updateOne({ _id: ObjectId(videoId) }, { $set: { title } })
+          const updateInfo = await model.db.collection('videos').updateOne({ _id: ObjectId(videoId) }, { $set: { title } })
 
           if (updateInfo.matchedCount === 0) {
-            this._send(res, WEB_STATUS_BAD_REQUEST, { message: "Invalid videoId" })
+            this._send(res, WEB_STATUS_BAD_REQUEST, { message: 'Invalid videoId' })
             return
           }
 
           if (updateInfo.modifiedCount === 0) {
-            throw new Error("Video with id " + videoId + " could not be updated.")
+            throw new Error('Video with id ' + videoId + ' could not be updated.')
           }
 
-          const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) }, { projection: { "object_detection.detections": 0 } })
+          const video = await model.db.collection('videos').findOne({ _id: ObjectId(videoId) }, { projection: { 'object_detection.detections': 0 } })
 
           const _links = {
-            self: videoUrl("get", videoId),
-            "start-object-detection": objectDetectionUrl("start", videoId),
-            "cancel-object-detection": objectDetectionUrl("cancel", videoId),
+            self: videoUrl('get', videoId),
+            'start-object-detection': objectDetectionUrl('start', videoId),
+            'cancel-object-detection': objectDetectionUrl('cancel', videoId),
             ...generateLinks(videoId)
           }
 

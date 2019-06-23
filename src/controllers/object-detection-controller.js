@@ -2,26 +2,24 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-const Controller = require("./controller")
-const logger = require("../util/logger")
-const model = require("../models/model")
-const { ObjectId } = require("mongodb")
-const config = require("../util/config-loader")
-const fetch = require("cross-fetch")
-const formatRoute = require("../util/format-route")
-const { webAddress, cvAddress } = require("../util/address")
-const crypto = require("crypto")
+const Controller = require('./controller')
+const logger = require('../util/logger')
+const model = require('../models/model')
+const { ObjectId } = require('mongodb')
+const config = require('../util/config-loader')
+const fetch = require('cross-fetch')
+const formatRoute = require('../util/format-route')
+const { webAddress, cvAddress } = require('../util/address')
 const {
   CV_STATUS_NOT_STARTED,
   CV_STATUS_CANCELED,
   CV_STATUS_FAILED,
   WEB_STATUS_BAD_REQUEST,
   WEB_STATUS_INTERNAL_SERVER_ERROR,
-  WEB_STATUS_NOT_FOUND,
   WEB_STATUS_FORBIDDEN,
   WEB_STATUS_OK,
   CV_STATUS_STARTED
-} = require("../util/status-codes")
+} = require('../util/status-codes')
 
 
 
@@ -43,30 +41,30 @@ class ObjectDetectionController extends Controller {
   start = async (req, res) => {
     const { videoId } = req.params
     try {
-      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
     } catch (err) {
       this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
     }
     try {
       await model.connect()
-      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
+      const video = await model.db.collection('videos').findOne({ _id: ObjectId(videoId) })
       if (video) {
         if (isObjectDetectionStatusValid(video.object_detection.status)) {
-          const startUrl = cvObjectDetectionUrl("start_object_detection", { video_id: videoId })
+          const startUrl = cvObjectDetectionUrl('start_object_detection', { video_id: videoId })
           await fetch(startUrl)
           const _links = {
-            self: objectDetectionUrl("start", videoId),
-            cancel: objectDetectionUrl("cancel", videoId)
+            self: objectDetectionUrl('start', videoId),
+            cancel: objectDetectionUrl('cancel', videoId)
           }
           this._send(res, WEB_STATUS_OK, {}, _links)
         }
         else {
-          this._send(res, WEB_STATUS_FORBIDDEN, { message: "Object detection is either completed or started already" })
+          this._send(res, WEB_STATUS_FORBIDDEN, { message: 'Object detection is either completed or started already' })
         }
       }
       else {
-        this._send(res, WEB_STATUS_BAD_REQUEST, { message: "Invalid videoId" })
+        this._send(res, WEB_STATUS_BAD_REQUEST, { message: 'Invalid videoId' })
       }
     } catch (err) {
       this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)
@@ -77,7 +75,7 @@ class ObjectDetectionController extends Controller {
   cancel = async (req, res) => {
     const { videoId } = req.params
     try {
-      if (!ObjectId.isValid(videoId)) { throw new Error("Invalid videoId") }
+      if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
     } catch (err) {
       this._send(res, WEB_STATUS_BAD_REQUEST, { message: err.message })
       return
@@ -85,22 +83,22 @@ class ObjectDetectionController extends Controller {
 
     try {
       await model.connect()
-      const video = await model.db.collection("videos").findOne({ _id: ObjectId(videoId) })
+      const video = await model.db.collection('videos').findOne({ _id: ObjectId(videoId) })
       if (video) {
         if (video.object_detection.status === CV_STATUS_STARTED) {
-          const cancelUrl = cvObjectDetectionUrl("cancel_object_detection", { video_id: videoId })
+          const cancelUrl = cvObjectDetectionUrl('cancel_object_detection', { video_id: videoId })
           await fetch(cancelUrl)
           const _links = {
-            self: objectDetectionUrl("cancel", videoId)
+            self: objectDetectionUrl('cancel', videoId)
           }
           this._send(res, WEB_STATUS_OK, {}, _links)
         }
         else {
-          this._send(res, WEB_STATUS_FORBIDDEN, { message: "Object detection is not yet started" })
+          this._send(res, WEB_STATUS_FORBIDDEN, { message: 'Object detection is not yet started' })
         }
       }
       else {
-        this._send(res, WEB_STATUS_BAD_REQUEST, { message: "Invalid videoId" })
+        this._send(res, WEB_STATUS_BAD_REQUEST, { message: 'Invalid videoId' })
       }
     } catch (err) {
       this._send(res, WEB_STATUS_INTERNAL_SERVER_ERROR)

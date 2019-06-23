@@ -1,14 +1,14 @@
-const mongodb = require("mongodb")
-const config = require("../util/config-loader")
+const mongodb = require('mongodb')
+const config = require('../util/config-loader')
 
 class Model {
 
   constructor() {
     const MongoClient = mongodb.MongoClient
-    const name = config["mongo"]["name"]
-    const host = config["mongo"]["host"]
-    const user = config["mongo"]["user"]
-    const password = config["mongo"]["password"]
+    const name = config['mongo']['name']
+    const host = config['mongo']['host']
+    const user = config['mongo']['user']
+    const password = config['mongo']['password']
     const url = `mongodb://${user}:${password}@${host}:27017/${name}`
     this._client = new MongoClient(url, { useNewUrlParser: true })
     this._name = name

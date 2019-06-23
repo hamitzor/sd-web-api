@@ -1,7 +1,7 @@
 /**
  * @author thenrerise@gmail.com (Hamit Zor)
  */
-const logger = require("../util/logger")
+const logger = require('../util/logger')
 
 module.exports = class WsController {
   _send = (ws, status, payload = {}) => {
