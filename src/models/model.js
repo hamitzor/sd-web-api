@@ -5,10 +5,10 @@ class Model {
 
   constructor() {
     const MongoClient = mongodb.MongoClient
-    const name = config['mongo']['name']
-    const host = config['mongo']['host']
-    const user = config['mongo']['user']
-    const password = config['mongo']['password']
+    const name = config.mongo.db_name
+    const host = config.mongo.hostname
+    const user = config.mongo.username
+    const password = config.mongo.password
     const url = `mongodb://${user}:${password}@${host}:27017/${name}`
     this._client = new MongoClient(url, { useNewUrlParser: true })
     this._name = name

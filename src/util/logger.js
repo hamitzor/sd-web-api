@@ -1,6 +1,7 @@
 const model = require('../models/model')
-const codes = require('./codes-loader')
+const config = require('./config-loader')
 
+const codes = config.codes
 
 class Logger {
   constructor() {

@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, config.storage.videos)
   },
   filename: function (_, file, cb) {
-    const id = crypto.randomBytes(20).toString('hex')
+    const id = crypto.randomBytes(3).toString('hex')
     cb(null, `${id}_${file.originalname}`)
   }
 })

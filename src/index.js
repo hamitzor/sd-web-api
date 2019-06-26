@@ -12,6 +12,7 @@ const videoRouter = require('./routers/video-router')
 const objectDetectionRouter = require('./routers/object-detection-router')
 const objectDetectionWsRouter = require('./routers/object-detection-ws-router')
 const cvFeedbackRouter = require('./routers/cv-feedback-router')
+const configRouter = require('./routers/config-router')
 const { urlencoded } = require('body-parser')
 const config = require('./util/config-loader')
 const globalEe = require('./global-ee')
@@ -26,9 +27,11 @@ globalEe.on(OBJECT_DETECTION_PROGRESS_CHANGED, data => console.log(data))
 
 
 const port = config.web_api.port
-const host = config.web_api.host
+const host = config.web_api.hostname
 const backlog = () => console.log(`Web API is online at ${host}:${port}`)
 
+app.enable('trust proxy')
+app.use(config.web_api.route.config.sub_route, configRouter)
 app.use(config.web_api.route.video.sub_route, urlencoded({ extended: true }), videoRouter)
 app.use(config.web_api.route.object_detection.sub_route, objectDetectionRouter)
 app.use(config.web_api.ws_route.object_detection.sub_route, objectDetectionWsRouter)
