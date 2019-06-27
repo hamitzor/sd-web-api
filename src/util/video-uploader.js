@@ -1,6 +1,7 @@
 const multer = require('multer')
 const config = require('./config-loader')
 const crypto = require('crypto')
+const mimeTypes = require('mime-types')
 
 
 const storage = multer.diskStorage({
@@ -9,7 +10,8 @@ const storage = multer.diskStorage({
   },
   filename: function (_, file, cb) {
     const id = crypto.randomBytes(3).toString('hex')
-    cb(null, `${id}_${file.originalname}`)
+    const extension = mimeTypes.extension(file.mimetype)
+    cb(null, `${id}.${extension}`)
   }
 })
 
