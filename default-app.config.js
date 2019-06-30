@@ -1,4 +1,8 @@
 module.exports = {
+  web: {
+    hostname: '192.168.1.166',
+    port: 3100,
+  },
   cv_api: {
     https: false,
     hostname: '192.168.1.166',

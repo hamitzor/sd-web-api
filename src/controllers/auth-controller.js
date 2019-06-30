@@ -16,13 +16,13 @@ class AuthController extends Controller {
   login = async (req, res) => {
     try {
       const { username, password } = req.params
-      const newSessionId = await authModel.login({ username, password })
+      const { sessionId: newSessionId, user } = await authModel.login({ username, password })
       if (!newSessionId) {
         this._send(res, WEB_STATUS.BAD_REQUEST, { message: 'Wrong username or password' })
         return
       }
       res.cookie(COOKIE_NAME, newSessionId, { maxAge: 999999999999 })
-      this._send(res, WEB_STATUS.OK, { sessionId: newSessionId })
+      this._send(res, WEB_STATUS.OK, { sessionId: newSessionId, user: { username: user.username } })
     }
     catch (err) {
       this._send(res, WEB_STATUS.INTERNAL_SERVER_ERROR)
@@ -38,9 +38,9 @@ class AuthController extends Controller {
         return
       }
       await authModel.register({ username, password })
-      const newSessionId = await authModel.login({ username, password })
+      const { sessionId: newSessionId, user } = await authModel.login({ username, password })
       res.cookie(COOKIE_NAME, newSessionId, { maxAge: 999999999999 })
-      this._send(res, WEB_STATUS.OK, { sessionId: newSessionId })
+      this._send(res, WEB_STATUS.OK, { sessionId: newSessionId, user: { username: user.username } })
     }
     catch (err) {
       this._send(res, WEB_STATUS.INTERNAL_SERVER_ERROR)

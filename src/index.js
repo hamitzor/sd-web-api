@@ -21,6 +21,9 @@ const globalEe = require('./global-ee')
 const cookieParser = require('cookie-parser')
 const { authChecker } = require('./express-middlewares/auth')
 const allowIps = require('./express-middlewares/allowIps')
+const cors = require('cors')
+const { webAddress } = require('./util/address')
+
 
 
 const {
@@ -36,6 +39,8 @@ const port = config.web_api.port
 const host = config.web_api.hostname
 const backlog = () => console.log(`Web API is online at ${host}:${port}`)
 
+
+app.use(cors({ origin: webAddress, credentials: true }))
 app.enable('trust proxy')
 app.use(cookieParser())
 app.use(config.web_api.route.config.sub_route, configRouter)

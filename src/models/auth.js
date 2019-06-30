@@ -11,9 +11,9 @@ const login = async ({ username, password }) => {
   if (user) {
     const sessionId = generateSessionId()
     await model.db.collection('users').updateOne({ _id: ObjectId(user._id) }, { $set: { sessionId } })
-    return sessionId
+    return { sessionId, user }
   }
-  return null
+  return {}
 }
 
 const logout = async (userId) => {

@@ -12,7 +12,7 @@ const config = require('../util/config-loader')
 const fetch = require('cross-fetch')
 const assert = require('assert')
 const formatRoute = require('../util/format-route')
-const { webAddress, cvAddress } = require('../util/address')
+const { webApiAddress, cvApiAddress } = require('../util/address')
 
 const WEB_STATUS = config.codes.web_status
 const CV_STATUS = config.codes.cv_status
@@ -20,17 +20,17 @@ const CV_STATUS = config.codes.cv_status
 
 const videoRouteInfo = config.web_api.route.video
 
-const videoUrl = (name, id) => webAddress + videoRouteInfo.sub_route +
+const videoUrl = (name, id) => webApiAddress + videoRouteInfo.sub_route +
   formatRoute(videoRouteInfo[name], id !== undefined ? { video_id: id } : undefined)
 
 const objectDetectionRouteInfo = config.web_api.route.object_detection
 
-const objectDetectionUrl = (name, id) => webAddress + objectDetectionRouteInfo.sub_route +
+const objectDetectionUrl = (name, id) => webApiAddress + objectDetectionRouteInfo.sub_route +
   formatRoute(objectDetectionRouteInfo[name], id !== undefined ? { video_id: id } : undefined)
 
 const cvObjectDetectionRouteInfo = config.cv_api.route.object_detection
 
-const cvObjectDetectionUrl = (name, mapping) => cvAddress + cvObjectDetectionRouteInfo.sub_route +
+const cvObjectDetectionUrl = (name, mapping) => cvApiAddress + cvObjectDetectionRouteInfo.sub_route +
   formatRoute(cvObjectDetectionRouteInfo[name], mapping)
 
 
