@@ -2,18 +2,16 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 
-const Controller = require('./controller')
+const { Controller } = require('./controller')
 const config = require('../util/config-loader')
-const {
-  WEB_STATUS_OK,
-  WEB_STATUS_FORBIDDEN
-} = require('../util/status-codes')
+
+const WEB_STATUS = config.codes.web_status
 
 
 class VideoController extends Controller {
 
   public = async (req, res) => {
-    this._send(res, WEB_STATUS_OK, {
+    this._send(res, WEB_STATUS.OK, {
       ...config,
       mongo: undefined,
       storage: undefined
@@ -21,12 +19,7 @@ class VideoController extends Controller {
   }
 
   private = async (req, res) => {
-    if (config.web_api.private_config_client_ips.includes(req.ip)) {
-      this._send(res, WEB_STATUS_OK, config)
-    }
-    else {
-      this._send(res, WEB_STATUS_FORBIDDEN, { message: "This action is forbidden." })
-    }
+    this._send(res, WEB_STATUS.OK, config)
   }
 }
 

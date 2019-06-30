@@ -5,17 +5,17 @@
 const WsController = require('./ws-controller')
 const logger = require('../util/logger')
 const { ObjectId } = require('mongodb')
-const {
-  WEB_STATUS_BAD_REQUEST,
-  WEB_STATUS_INTERNAL_SERVER_ERROR,
-  WEB_STATUS_OK,
-} = require('../util/status-codes')
+const config = require('../util/config-loader')
+
+
+
 const globalEe = require('../global-ee')
 const {
   OBJECT_DETECTION_STATUS_UPDATED,
   OBJECT_DETECTION_PROGRESS_CHANGED
 } = require('../events')
 
+const WEB_STATUS = config.codes.web_status
 
 class ObjectDetectionWsController extends WsController {
 
@@ -25,17 +25,17 @@ class ObjectDetectionWsController extends WsController {
       try {
         if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
       } catch (err) {
-        this._sendAndClose(ws, WEB_STATUS_BAD_REQUEST, { message: err.message })
+        this._sendAndClose(ws, WEB_STATUS.BAD_REQUEST, { message: err.message })
         return
       }
       try {
         globalEe.on(OBJECT_DETECTION_STATUS_UPDATED, event => {
           if (event.videoId === videoId) {
-            this._send(ws, WEB_STATUS_OK, { status: event.status })
+            this._send(ws, WEB_STATUS.OK, { status: event.status })
           }
         })
       } catch (err) {
-        this._sendAndClose(ws, WEB_STATUS_INTERNAL_SERVER_ERROR, { message: err.message })
+        this._sendAndClose(ws, WEB_STATUS.INTERNAL_SERVER_ERROR, { message: err.message })
         logger.logError(err.message, err.stack)
       }
     })
@@ -47,17 +47,17 @@ class ObjectDetectionWsController extends WsController {
       try {
         if (!ObjectId.isValid(videoId)) { throw new Error('Invalid videoId') }
       } catch (err) {
-        this._sendAndClose(ws, WEB_STATUS_BAD_REQUEST, { message: err.message })
+        this._sendAndClose(ws, WEB_STATUS.BAD_REQUEST, { message: err.message })
         return
       }
       try {
         globalEe.on(OBJECT_DETECTION_PROGRESS_CHANGED, event => {
           if (event.videoId === videoId) {
-            this._send(ws, WEB_STATUS_OK, { progress: event.progress })
+            this._send(ws, WEB_STATUS.OK, { progress: event.progress })
           }
         })
       } catch (err) {
-        this._sendAndClose(ws, WEB_STATUS_INTERNAL_SERVER_ERROR, { message: err.message })
+        this._sendAndClose(ws, WEB_STATUS.INTERNAL_SERVER_ERROR, { message: err.message })
         logger.logError(err.message, err.stack)
       }
     })
