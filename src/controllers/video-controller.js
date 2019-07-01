@@ -47,7 +47,6 @@ class VideoController extends Controller {
 
   get = async (req, res) => {
     const { videoId } = req.params
-
     if (!req.auth.user.videos.map(id => id.toString()).includes(videoId)) {
       this._send(res, WEB_STATUS.FORBIDDEN)
     }
@@ -197,7 +196,6 @@ class VideoController extends Controller {
             title: title,
             length: metadata.payload.length,
             extension: filename.split('.').pop(),
-            name: filename,
             size: metadata.payload.size,
             fps: metadata.payload.fps,
             frame_count: metadata.payload.frame_count,

@@ -60,7 +60,7 @@ module.exports = {
         upload_progress: '/video-upload-progress/<upload_id>/'
       },
       object_detection: {
-        sub_route: '/object-detection',
+        sub_route: '/object-detection-ws',
         watch_status: '/watch-status/<video_id>/',
         watch_progress: '/watch-progress/<video_id>/'
       }
