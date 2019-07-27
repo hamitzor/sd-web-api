@@ -17,7 +17,7 @@ const authRouter = require('./routers/auth-router')
 const errorController = require('./controllers/error-controller')
 const { urlencoded } = require('body-parser')
 const config = require('./util/config-loader')
-const globalEe = require('./global-ee')
+const globalEe = require('./event-emmiters/global-ee')
 const cookieParser = require('cookie-parser')
 const { authChecker } = require('./express-middlewares/auth')
 const allowIps = require('./express-middlewares/allowIps')
@@ -29,7 +29,7 @@ const { webAddress } = require('./util/address')
 const {
   OBJECT_DETECTION_STATUS_UPDATED,
   OBJECT_DETECTION_PROGRESS_CHANGED
-} = require('./events')
+} = require('./event-emmiters/events')
 
 globalEe.on(OBJECT_DETECTION_STATUS_UPDATED, data => console.log(data))
 globalEe.on(OBJECT_DETECTION_PROGRESS_CHANGED, data => console.log(data))

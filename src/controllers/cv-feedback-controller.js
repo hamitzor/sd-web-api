@@ -5,14 +5,14 @@
 const { Controller } = require('./controller')
 const model = require('../models/model')
 const { ObjectId } = require('mongodb')
-const globalEe = require('../global-ee')
+const globalEe = require('../event-emmiters/global-ee')
 const config = require('../util/config-loader')
 
 
 const {
   OBJECT_DETECTION_STATUS_UPDATED,
   OBJECT_DETECTION_PROGRESS_CHANGED
-} = require('../events')
+} = require('../event-emmiters/events')
 
 const WEB_STATUS = config.codes.web_status
 
