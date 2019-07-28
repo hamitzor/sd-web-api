@@ -24,7 +24,7 @@ class AuthController extends Controller {
     }
     catch (err) {
       this._send(res, status.web.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message, err.stack)
+      logger.error(err.message, err.stack)
     }
   }
 
@@ -42,7 +42,7 @@ class AuthController extends Controller {
     }
     catch (err) {
       this._send(res, status.web.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message, err.stack)
+      logger.error(err.message, err.stack)
     }
   }
 
@@ -60,14 +60,14 @@ class AuthController extends Controller {
       }
       if (!await auth.logout(user._id)) {
         this._send(res, status.web.INTERNAL_SERVER_ERROR)
-        logger.logError(`Cannot logout user ${user.username}`)
+        logger.error(`Cannot logout user ${user.username}`)
         return
       }
       res.clearCookie(COOKIE_NAME)
       this._send(res, status.web.OK)
     } catch (err) {
       this._send(res, status.web.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message, err.stack)
+      logger.error(err.message, err.stack)
     }
   }
 
@@ -87,7 +87,7 @@ class AuthController extends Controller {
     }
     catch (err) {
       this._send(res, status.web.INTERNAL_SERVER_ERROR)
-      logger.logError(err.message, err.stack)
+      logger.error(err.message, err.stack)
     }
   }
 

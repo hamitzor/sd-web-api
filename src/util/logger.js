@@ -16,11 +16,11 @@ class Logger {
     db.collection(this._collection).insertOne({ date: this._now(), message, stack, type })
   }
 
-  logError(message, stack) {
+  error(message, stack) {
     this._log(message, logStatus.ERROR, stack)
   }
 
-  logInfo(message) {
+  info(message) {
     this._log(message, logStatus.INFO)
   }
 

@@ -1,5 +1,5 @@
 const mongodb = require('mongodb')
-const config = require('../util/config-loader')
+const config = require('../../app.config')
 
 
 class DbConnection {

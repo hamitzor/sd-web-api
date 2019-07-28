@@ -1,7 +1,5 @@
-//const config = require('./config-loader')
+const config = require('../../app.config')
 
-//const webAddress = 'http://' + config.web.hostname + ':' + config.web.port
-//const webApiAddress = 'http://' + config.web_api.hostname + ':' + config.web_api.port
-//const cvApiAddress = 'http://' + config.cv_api.hostname + ':' + config.cv_api.port
+const webAddress = 'http://' + '127.0.0.1' + ':' + config.port
 
-module.exports = {}
+module.exports = { webAddress }

@@ -1,6 +1,6 @@
 const authModel = require('../models/auth')
 const logger = require('../util/logger')
-const config = require('../util/config-loader')
+const config = require('../../app.config')
 const { send } = require('../controllers/controller')
 
 const WEB_STATUS = config.codes.web_status
@@ -23,7 +23,7 @@ exports.authChecker = async (req, res, next) => {
     send(res, WEB_STATUS.FORBIDDEN)
   }
   catch (err) {
-    logger.logError(err.message, err.stack)
+    logger.error(err.message, err.stack)
     send(res, WEB_STATUS.INTERNAL_SERVER_ERROR)
   }
 }
