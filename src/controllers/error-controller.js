@@ -3,13 +3,12 @@
  */
 
 const { Controller } = require('./controller')
-const config = require('../util/config-loader')
+const { web: webStatus } = require('../../status-codes')
 
-const WEB_STATUS = config.codes.web_status
 
 class ErrorController extends Controller {
-  index = (req, res) => {
-    this._send(res, WEB_STATUS.BAD_ENDPOINT)
+  notFound = (req, res) => {
+    this._send(res, webStatus.BAD_ENDPOINT)
   }
 }
 

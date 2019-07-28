@@ -1,11 +1,11 @@
 module.exports = {
   web: {
-    hostname: '192.168.1.166',
+    hostname: '127.0.0.1',
     port: 3100,
   },
   cv_api: {
     https: false,
-    hostname: '192.168.1.166',
+    hostname: '127.0.0.1',
     port: 8001,
     route: {
       object_detection: {
@@ -18,10 +18,10 @@ module.exports = {
   },
   web_api: {
     https: false,
-    hostname: '192.168.1.166',
+    hostname: '127.0.0.1',
     port: 3000,
     private_config_client_ips: [
-      '192.168.1.166'
+      '127.0.0.1'
     ],
     route: {
       config: {

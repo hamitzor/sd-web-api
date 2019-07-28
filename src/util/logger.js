@@ -1,11 +1,10 @@
-const model = require('../models/model')
-const config = require('./config-loader')
+const connectDb = require('../database/db-connection').connect
+const { log: logStatus } = require('../../status-codes')
 
-const codes = config.codes
 
 class Logger {
   constructor() {
-    this._colName = 'web_logs'
+    this._collection = 'webLogs'
   }
 
   _now() {
@@ -13,16 +12,16 @@ class Logger {
   }
 
   async _log(message, type, stack) {
-    await model.connect()
-    model.db.collection(this._colName).insertOne({ date: this._now(), message, stack, type })
+    const db = await connectDb()
+    db.collection(this._collection).insertOne({ date: this._now(), message, stack, type })
   }
 
   logError(message, stack) {
-    this._log(message, codes.log_type.ERROR, stack)
+    this._log(message, logStatus.ERROR, stack)
   }
 
   logInfo(message) {
-    this._log(message, codes.log_type.INFO)
+    this._log(message, logStatus.INFO)
   }
 
 }

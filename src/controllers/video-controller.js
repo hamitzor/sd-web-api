@@ -154,7 +154,7 @@ class VideoController extends Controller {
     videoUploader(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
         logger.logError(err.message, err.stack)
-        this._send(res, WEB_STATUS.BAD_REQUEST)
+        this._send(res, WEB_STATUS.BAD_REQUEST, { message: err.message })
       } else if (err) {
         logger.logError(err.message, err.stack)
         this._send(res, WEB_STATUS.INTERNAL_SERVER_ERROR)

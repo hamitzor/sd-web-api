@@ -7,7 +7,7 @@ const WEB_STATUS = config.codes.web_status
 module.exports = (whitelist = []) => {
   return (req, res, next) => {
     try {
-      if (whitelist.includes(req.ip)) {
+      if (whitelist.includes(req.ip.replace('::ffff:', ''))) {
         next()
         return
       }
