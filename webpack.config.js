@@ -17,6 +17,9 @@ const coreConfig = {
     rules: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
     ]
+  },
+  stats: {
+    warnings: false,
   }
 }
 

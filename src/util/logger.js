@@ -1,4 +1,5 @@
-const connectDb = require('../database/db-connection').connect
+const { connection } = require('../database/connect')
+
 const { log: logStatus } = require('../../status-codes')
 
 
@@ -12,8 +13,7 @@ class Logger {
   }
 
   async _log(message, type, stack) {
-    const db = await connectDb()
-    db.collection(this._collection).insertOne({ date: this._now(), message, stack, type })
+    connection.db.collection(this._collection).insertOne({ date: this._now(), message, stack, type })
   }
 
   error(message, stack) {

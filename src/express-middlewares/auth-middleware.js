@@ -1,13 +1,9 @@
 const authModel = require('../models/auth')
 const logger = require('../util/logger')
-const config = require('../../app.config')
-const { send } = require('../controllers/controller')
 
-const WEB_STATUS = config.codes.web_status
+const COOKIE_NAME = 'AUTH_DATA'
 
-const COOKIE_NAME = config.auth.cookie_name
-
-exports.authChecker = async (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const setSessionId = req.cookies[COOKIE_NAME]
     if (setSessionId) {
@@ -20,10 +16,10 @@ exports.authChecker = async (req, res, next) => {
         return
       }
     }
-    send(res, WEB_STATUS.FORBIDDEN)
+    res.forbidden()
   }
   catch (err) {
     logger.error(err.message, err.stack)
-    send(res, WEB_STATUS.INTERNAL_SERVER_ERROR)
+    res.internalServerError()
   }
 }
