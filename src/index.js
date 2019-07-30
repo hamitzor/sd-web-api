@@ -19,11 +19,19 @@ const { connectDb } = require('./database/connect')
 
 const init = async () => {
   await connectDb()
+
   app.use(cors({ origin: webAddress, credentials: true }))
   app.enable('trust proxy')
   app.use(cookieParser())
-  app.use(bodyParser.json())
   app.use(resMiddleware())
+  app.use(bodyParser.json())
+  app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError) {
+      res.badRequest("Bad payload")
+      return
+    }
+    next()
+  })
   app.use(rootRouter)
   app.listen(config.port, () => console.log(`SceneDetector API is online at http://localhost:${config.port}`))
 }

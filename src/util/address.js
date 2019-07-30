@@ -1,5 +1,5 @@
 const config = require('../../app.config')
 
-const webAddress = 'http://' + '127.0.0.1' + ':' + config.port
+const webAddress = 'http://localhost:3100'
 
 module.exports = { webAddress }
