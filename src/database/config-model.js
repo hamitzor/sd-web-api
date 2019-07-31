@@ -1,5 +1,8 @@
-const { connection } = require('./connect')
-const { ObjectID } = require('mongodb')
+
+/**
+ *
+ *
+ *
 const { assertNoMatch, assertDuplicate } = require('./errors')
 
 exports.findOne = async (id, projection) => {
@@ -78,3 +81,4 @@ exports.deleteField = async (configId, fieldId) => {
       { returnOriginal: false })
   assertNoMatch(!r.value)
 }
+ */

@@ -15,10 +15,8 @@ const { webAddress } = require('./util/address')
 const rootRouter = require('./routers')
 const resMiddleware = require('./express-middlewares/res-middleware')
 const bodyParser = require('body-parser')
-const { connectDb } = require('./database/connect')
 
 const init = async () => {
-  await connectDb()
 
   app.use(cors({ origin: webAddress, credentials: true }))
   app.enable('trust proxy')
