@@ -5,7 +5,7 @@
 const logger = require('../util/logger')
 const config = require('../../app.config')
 const { ObjectId } = require('mongoose').mongo
-const { ConfigSet } = require('../database/config-set-model')
+const { ConfigSet, ConfigField } = require('../database/config-set-model')
 
 const handleException = (err, res) => {
   console.log(err)
@@ -27,7 +27,8 @@ const handleException = (err, res) => {
       break
     default:
       res.internalServerError(err)
-      logger.error(err.message, err.stack)
+      console.log(err)
+    //logger.error(err.message, err.stack)
   }
 }
 
@@ -50,7 +51,14 @@ const addConfigLinks = doc => ({ ...doc, fields: doc.fields.map(field => addFiel
 
 exports.getAll = async (req, res) => {
   try {
-    res.ok((await ConfigSet.find()).map(c => addConfigLinks(c.toObject())))
+    const data = (await ConfigField.find()).reduce((acc, field) => ({
+      ...acc, [field.configSetId]: acc[field.configSetId] ? [...acc[field.configSetId], field] : [field]
+    }), {})
+
+    res.ok(Object.keys(data).map(name => ({
+      name: name,
+      fields: data[name]
+    })))
   }
   catch (err) {
     handleException(err, res)
@@ -59,10 +67,8 @@ exports.getAll = async (req, res) => {
 
 exports.get = async (req, res) => {
   try {
-    const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest("id is not valid"); return }
-    const doc = await ConfigSet.findOne({ _id: id })
-    res.ok(doc ? addConfigLinks(doc.toObject()) : doc)
+    const { _id } = req.params
+    res.ok(await ConfigField.find({ configSetId: _id }))
   }
   catch (err) {
     handleException(err, res)
@@ -71,14 +77,14 @@ exports.get = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { name } = req.body
-    res.ok(addConfigLinks((await new ConfigSet({ name }).save()).toObject()))
+    const { _id } = req.body
+    res.ok((await new ConfigSet({ _id }).save()).toObject())
   }
   catch (err) {
     handleException(err, res)
   }
 }
-
+//@TODO
 exports.update = async (req, res) => {
   try {
     const { id } = req.params
@@ -90,7 +96,7 @@ exports.update = async (req, res) => {
     handleException(err, res)
   }
 }
-
+//@TODO
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params
@@ -102,15 +108,14 @@ exports.delete = async (req, res) => {
     handleException(err, res)
   }
 }
-
+//@TODO
 exports.createField = async (req, res) => {
   try {
-    const { configId } = req.params
+    const { configSetId } = req.params
     const { key, value } = req.body
-    if (!ObjectId.isValid(configId)) { res.badRequest("configId is not valid"); return }
-    const field = { key, value }
-    const { n: matchCount } = await ConfigSet.updateOne({ _id: configId }, { $push: { fields: field } }, { runValidators: true })
-    res.ok(matchCount > 0 ? addFieldLinks(field, configId) : null)
+    const field = new ConfigField({ key, value, configSetId })
+    await field.save()
+    res.ok(field.toObject())
   }
   catch (err) {
     handleException(err, res)
