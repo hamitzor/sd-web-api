@@ -6,7 +6,7 @@ const coreConfig = {
   entry: './index',
   devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'lib'),
     filename: 'bundle.index.js'
   },
   target: 'node',

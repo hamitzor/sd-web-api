@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --mode production",
-    "start": "nodemon -r source-map-support/register dist/bundle.index.js",
+    "start": "nodemon -r source-map-support/register lib/bundle.index.js",
     "watch": "webpack --watch --mode development"
   },
   "dependencies": {

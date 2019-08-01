@@ -15,9 +15,9 @@ const { webAddress } = require('./util/address')
 const rootRouter = require('./routers')
 const resMiddleware = require('./express-middlewares/res-middleware')
 const bodyParser = require('body-parser')
+const initDatabase = require('./database/init-database')
 
-const init = async () => {
-
+initDatabase().then(() => {
   app.use(cors({ origin: webAddress, credentials: true }))
   app.enable('trust proxy')
   app.use(cookieParser())
@@ -32,5 +32,6 @@ const init = async () => {
   })
   app.use(rootRouter)
   app.listen(config.port, () => console.log(`SceneDetector API is online at http://localhost:${config.port}`))
-}
-init()
+})
+
+

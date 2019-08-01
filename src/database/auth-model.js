@@ -1,4 +1,7 @@
-const { connection } = require('./connect')
+/**
+ *
+ *
+ * const { connection } = require('./connect')
 const { ObjectId } = require('mongodb')
 const { generateSessionId, hashPassword } = require('../util/auth')
 
@@ -44,3 +47,4 @@ exports.register = async ({ username, password }) => {
     videos: []
   })
 }
+ */

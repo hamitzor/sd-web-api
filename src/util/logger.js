@@ -1,4 +1,4 @@
-const { connection } = require('../database/connect')
+const { connection } = require('../database/init-database')
 
 const { log: logStatus } = require('../../status-codes')
 
