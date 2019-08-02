@@ -1,15 +1,15 @@
 const express = require('express')
-const configController = require('../controllers/config-controller')
+const controller = require('../controllers/config-set-controller')
 
-const configRouter = express.Router()
+const router = express.Router()
 
-configRouter.get('/', configController.getAll)
-configRouter.get('/:_id', configController.get)
-configRouter.post('/', configController.create)
-configRouter.put('/:_id', configController.update)
-configRouter.delete('/:_id', configController.delete)
-configRouter.post('/field/:configSetId', configController.createField)
-configRouter.put('/field/:_id', configController.updateField)
-//configRouter.delete('/field/:configId/:fieldId', configController.deleteField)
+router.get('/', controller.getAll)
+router.get('/:id', controller.get)
+router.post('/', controller.create)
+router.put('/:id', controller.update)
+router.delete('/:id', controller.delete)
+router.post('/field/:configSetId', controller.createField)
+router.put('/field/:id', controller.updateField)
+router.delete('/field/:id', controller.deleteField)
 
-module.exports = configRouter
+module.exports = router

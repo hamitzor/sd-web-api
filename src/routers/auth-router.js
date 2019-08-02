@@ -1,14 +1,14 @@
 const express = require('express')
-const authController = require('../controllers/auth-controller')
+const controller = require('../controllers/auth-controller')
 
-const authRouter = express.Router()
+const router = express.Router()
 
-authRouter.get('/login/:username/:password/', authController.login)
+router.get('/login/:username/:password/', controller.login)
 
-authRouter.get('/logout/', authController.logout)
+router.get('/logout/', controller.logout)
 
-authRouter.get('/register/:username/:password/', authController.register)
+router.get('/register/:username/:password/', controller.register)
 
-authRouter.get('/is-logged-in/', authController.isLoggedIn)
+router.get('/is-logged-in/', controller.isLoggedIn)
 
-module.exports = authRouter
+module.exports = router

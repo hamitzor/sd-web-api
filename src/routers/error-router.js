@@ -1,8 +1,8 @@
 const express = require('express')
-const errorController = require('../controllers/error-controller')
+const controller = require('../controllers/error-controller')
 
-const errorRouter = express.Router()
+const router = express.Router()
 
-errorRouter.all('*', errorController.notFound)
+router.all('*', controller.notFound)
 
-module.exports = errorRouter
+module.exports = router

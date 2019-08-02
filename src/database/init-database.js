@@ -1,34 +1,29 @@
 const config = require('../../app.config')
 const mongoose = require('mongoose')
-const { username, password, host, name } = config.db
-const url = `mongodb://${username}:${password}@${host}:27017/${name}`
+
+mongoose.set('useNewUrlParser', true)
+mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
 
 
-const connectMongo = url => mongoose.connect(url, {
-  autoReconnect: true,
-  reconnectTries: Number.MAX_VALUE,
-  reconnectInterval: 1000
-})
+const connectMongo = ({ user, pwd, host, name }) => mongoose.connect(`mongodb://${user}:${pwd}@${host}:27017/${name}`)
 
-module.exports = () => {
-
-  if (process.env.NODE_ENV === 'development') {
-
-    const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer
-
-    const mongod = new MongoMemoryServer()
-
-
-    return mongod.getConnectionString().then(mockUrl => {
-
-      return connectMongo(mockUrl).then(() => {
-        console.log('Development database initialized')
-      })
+exports.clearDatabase = () =>
+  mongoose.connection.db.listCollections().toArray().then(list =>
+    Promise.all(list.map(col => mongoose.connection.db.dropCollection(col.name))).then(() => {
+      process.stdout.write("    ")
+      console.info("DB cleared")
     })
+  )
+
+exports.initDatabase = () => {
+
+  if (process.env.NODE_ENV === 'test') {
+    return connectMongo(config.testDb)
   }
   else {
-    return connectMongo(url).then(() => {
-      console.log('Production database initialized')
+    return connectMongo(config.db).then(() => {
+      console.info('Real database initialized')
     })
   }
 }

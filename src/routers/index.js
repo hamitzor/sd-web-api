@@ -3,10 +3,10 @@ const authRouter = require('./auth-router')
 const errorRouter = require('./error-router')
 const configRouter = require('./config-router')
 
-const rootRouter = express.Router()
+const router = express.Router()
 
-rootRouter.use('/auth', authRouter)
-rootRouter.use('/config', configRouter)
-rootRouter.all('*', errorRouter)
+router.use('/auth', authRouter)
+router.use('/config', configRouter)
+router.all('*', errorRouter)
 
-module.exports = rootRouter
+module.exports = router
