@@ -1,0 +1,14 @@
+module.exports = {
+  log: {
+    ERROR: 'ERROR',
+    INFO: 'INFO'
+  },
+  web: {
+    OK: 'OK',
+    INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+    BAD_REQUEST: 'BAD_REQUEST',
+    NOT_FOUND: 'NOT_FOUND',
+    FORBIDDEN: 'FORBIDDEN',
+    BAD_ENDPOINT: 'BAD_ENDPOINT'
+  }
+}

@@ -4,4 +4,3 @@ lib/**
 yarn.lock
 .vscode/**
 app.config.js
-status-codes.js
