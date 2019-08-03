@@ -6,15 +6,15 @@ module.exports = {
     port: 3100,
   },
   db: {
-    user: 'sdadmin',
-    pwd: 'root',
-    host: 'localhost',
-    name: 'sd',
+    user: '',
+    pwd: '',
+    host: '',
+    name: '',
   },
   testDb: {
-    user: 'sdtestadmin',
-    pwd: 'root',
-    host: 'localhost',
-    name: 'sdtest'
+    user: '',
+    pwd: '',
+    host: '',
+    name: ''
   }
 }
