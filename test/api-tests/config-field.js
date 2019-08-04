@@ -15,12 +15,17 @@ const app = require('../../src/app')
 
 /* eslint-disable no-undef */
 
+let cookie = ''
+
 describe('CONTROLLER TEST : config-field:createField', () => {
   before(async () => {
     await initDatabase()
+    const url = '/user-session'
+    const res = await request(app).post(url).send({ user: 'root', pwd: 'root' })
+    cookie = res.res.headers['set-cookie'][0].split(';')[0]
   })
   beforeEach(async () => {
-    await clearDatabase()
+    await await clearDatabase(['users', 'usersessions'])
   })
   it('bad configSetId', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -31,7 +36,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${new ObjectId()}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: 'aKey', value: 'aVal' })
+    const { body } = await request(app).post(url).send({ key: 'aKey', value: 'aVal' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{
       field: 'configSet',
@@ -47,7 +52,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: 'aKey', value: 'aVal' })
+    const { body } = await request(app).post(url).send({ key: 'aKey', value: 'aVal' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: 'aKey', value: 'aVal' })
@@ -61,7 +66,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: '', value: '' })
+    const { body } = await request(app).post(url).send({ key: '', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{ field: 'key', message: 'Path `key` is required.' }])
   })
@@ -74,7 +79,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: '', value: 'test' })
+    const { body } = await request(app).post(url).send({ key: '', value: 'test' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{ field: 'key', message: 'Path `key` is required.' }])
   })
@@ -87,7 +92,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: 'aKey', value: '' })
+    const { body } = await request(app).post(url).send({ key: 'aKey', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: 'aKey', value: '' })
@@ -101,7 +106,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: '1', value: 'aValue' })
+    const { body } = await request(app).post(url).send({ key: '1', value: 'aValue' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.duplicated)
   })
@@ -114,7 +119,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${doc._id}`
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ key: '1', value: '' })
+    const { body } = await request(app).post(url).send({ key: '1', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.duplicated)
   })
@@ -125,7 +130,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await initDatabase()
   })
   beforeEach(async () => {
-    await clearDatabase()
+    await await clearDatabase(['users', 'usersessions'])
   })
   it('bad id', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -136,7 +141,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${new ObjectId()}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: 'aKey', value: 'aVal' })
+    const { body } = await request(app).put(url).send({ key: 'aKey', value: 'aVal' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.null
   })
@@ -149,7 +154,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: 'updatedKey', value: 'updatedVal' })
+    const { body } = await request(app).put(url).send({ key: 'updatedKey', value: 'updatedVal' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: 'updatedKey', value: 'updatedVal' })
@@ -163,7 +168,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: '', value: '' })
+    const { body } = await request(app).put(url).send({ key: '', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: '0', value: '0' })
@@ -177,7 +182,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: '', value: 'updatedValue' })
+    const { body } = await request(app).put(url).send({ key: '', value: 'updatedValue' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: '0', value: 'updatedValue' })
@@ -191,7 +196,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: 'updatedKey', value: '' })
+    const { body } = await request(app).put(url).send({ key: 'updatedKey', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configFieldTester(body.payload, { key: 'updatedKey', value: '0' })
@@ -205,7 +210,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: '1', value: 'updatedValue' })
+    const { body } = await request(app).put(url).send({ key: '1', value: 'updatedValue' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.duplicated)
   })
@@ -218,7 +223,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ key: '1', value: '' })
+    const { body } = await request(app).put(url).send({ key: '1', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.duplicated)
   })
@@ -229,7 +234,7 @@ describe('CONTROLLER TEST : config-field:deleteField', () => {
     await initDatabase()
   })
   beforeEach(async () => {
-    await clearDatabase()
+    await await clearDatabase(['users', 'usersessions'])
   })
   it('bad id', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -240,7 +245,7 @@ describe('CONTROLLER TEST : config-field:deleteField', () => {
     await ConfigField.insertMany(fields)
     const url = '/config-field/BAD_ID'
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.idNotValid)
   })
@@ -253,7 +258,7 @@ describe('CONTROLLER TEST : config-field:deleteField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${new ObjectId()}`
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.null
   })
@@ -266,7 +271,7 @@ describe('CONTROLLER TEST : config-field:deleteField', () => {
     await ConfigField.insertMany(fields)
     const url = `/config-field/${fields[0]._id}`
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.equal(fields[0]._id.toString())
   })

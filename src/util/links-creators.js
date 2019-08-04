@@ -1,4 +1,6 @@
 const { rootAddress } = require('./address')
+const config = require('../../app.config')
+
 
 const addFieldLinks = field => ({ ...field, _links: ({ self: `${rootAddress}/config-field/${field._id}` }) })
 
@@ -27,4 +29,6 @@ const addUserSessionLinks = doc => ({
   }
 })
 
-module.exports = { addFieldLinks, addConfigLinks, addUserLinks, addUserSessionLinks }
+const createAvatarLink = filename => `${rootAddress}/static/${config.storage.avatars}/${filename}`
+
+module.exports = { addFieldLinks, addConfigLinks, addUserLinks, addUserSessionLinks, createAvatarLink }

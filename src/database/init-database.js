@@ -9,10 +9,12 @@ mongoose.set('useCreateIndex', true)
 
 const connectMongo = ({ user, pwd, host, name }) => mongoose.connect(`mongodb://${user}:${pwd}@${host}:27017/${name}`)
 
-exports.clearDatabase = async () => {
+exports.clearDatabase = async (excludes = []) => {
   const collections = await mongoose.connection.db.listCollections().toArray()
   for (const collection of collections) {
-    await mongoose.connection.db.collection(collection.name).deleteMany()
+    if (!excludes.includes(collection.name)) {
+      await mongoose.connection.db.collection(collection.name).deleteMany()
+    }
   }
   console.info('Database cleared')
 }

@@ -9,8 +9,8 @@
     "build": "webpack --watch --mode production",
     "start": "nodemon -r source-map-support/register lib/bundle.index.js",
     "watch": "webpack --watch --mode development",
-    "test-api-config-set": "NODE_ENV=test mocha ./test/api-tests/config-set --require ./test/util/override-console-methods --exit",
-    "test-api-config-field": "NODE_ENV=test mocha ./test/api-tests/config-field --require ./test/util/override-console-methods --exit"
+    "test-api-config-set": "NODE_ENV=test mocha ./test/api-tests/config-set --require ./test/index --exit",
+    "test-api-config-field": "NODE_ENV=test mocha ./test/api-tests/config-field --require ./test/index --exit"
   },
   "dependencies": {
     "@babel/core": "^7.4.5",

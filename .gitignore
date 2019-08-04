@@ -4,3 +4,4 @@ lib/**
 yarn.lock
 .vscode/**
 app.config.js
+uploads/**/*.*

@@ -12,24 +12,30 @@ const messages = require('../../src/messages')('config-set-api')
 
 const app = require('../../src/app')
 
-
 /* eslint-disable no-undef */
+
+let cookie = ''
 
 describe('CONTROLLER TEST : config-set:getAll', () => {
   before(async () => {
     await initDatabase()
+    const url = '/user-session'
+    const res = await request(app).post(url).send({ user: 'root', pwd: 'root' })
+    cookie = res.res.headers['set-cookie'][0].split(';')[0]
   })
+
   beforeEach(async () => {
-    await clearDatabase()
+    await clearDatabase(['users', 'usersessions'])
   })
 
   it('no set', async () => {
     const url = '/config'
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.eql([])
   })
+
   it('one set', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
     const fieldData = ['0', '1', '2'].map(i => ({ key: i, value: i }))
@@ -39,7 +45,7 @@ describe('CONTROLLER TEST : config-set:getAll', () => {
     await ConfigField.insertMany(fields)
     const url = '/config'
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.an('Array').and.to.have.lengthOf(1)
     configSetTester(body.payload[0], { name: doc.name }, fieldData)
@@ -56,28 +62,29 @@ describe('CONTROLLER TEST : config-set:getAll', () => {
     }
     const url = '/config'
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.an('Array').and.to.have.lengthOf(docCount)
     body.payload.forEach(o => configSetTester(o, { name: o.name }, fieldData))
   })
+
 })
 
 describe('CONTROLLER TEST : config-set:get', () => {
   beforeEach(async () => {
-    await clearDatabase()
+    await clearDatabase(['users', 'usersessions'])
   })
   it('bad id', async () => {
     const url = '/config/BAD_ID'
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.idNotValid)
   })
   it('wrong id', async () => {
     const url = `/config/${new ObjectId()}`
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.null
   })
@@ -90,7 +97,7 @@ describe('CONTROLLER TEST : config-set:get', () => {
     await ConfigField.insertMany(fields)
     const url = `/config/${doc._id}`
     console.info(`GET ${url}`)
-    const { body } = await request(app).get(url)
+    const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.an('Object')
     configSetTester(body.payload, { name: doc.name }, fieldData)
@@ -99,12 +106,12 @@ describe('CONTROLLER TEST : config-set:get', () => {
 
 describe('CONTROLLER TEST : config-set:create', () => {
   beforeEach(async () => {
-    await clearDatabase()
+    await clearDatabase(['users', 'usersessions'])
   })
   it('good request', async () => {
     const url = '/config'
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ name: 'Test' })
+    const { body } = await request(app).post(url).send({ name: 'Test' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configSetTester(body.payload, { name: 'Test' })
@@ -112,14 +119,14 @@ describe('CONTROLLER TEST : config-set:create', () => {
   it('name empty', async () => {
     const url = '/config'
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({ name: '' })
+    const { body } = await request(app).post(url).send({ name: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{ field: 'name', message: 'Path `name` is required.' }])
   })
   it('name undefined', async () => {
     const url = '/config'
     console.info(`POST ${url}`)
-    const { body } = await request(app).post(url).send({})
+    const { body } = await request(app).post(url).send({}).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{ field: 'name', message: 'Path `name` is required.' }])
   })
@@ -127,7 +134,7 @@ describe('CONTROLLER TEST : config-set:create', () => {
 
 describe('CONTROLLER TEST : config-set:update', () => {
   beforeEach(async () => {
-    await clearDatabase()
+    await clearDatabase(['users', 'usersessions'])
   })
   it('good request', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -138,7 +145,7 @@ describe('CONTROLLER TEST : config-set:update', () => {
     await ConfigField.insertMany(fields)
     const url = `/config/${doc._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ name: 'Updated' })
+    const { body } = await request(app).put(url).send({ name: 'Updated' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configSetTester(body.payload, { name: 'Updated' }, fieldData)
@@ -152,7 +159,7 @@ describe('CONTROLLER TEST : config-set:update', () => {
     await ConfigField.insertMany(fields)
     const url = `/config/${doc._id}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({ name: '' })
+    const { body } = await request(app).put(url).send({ name: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.a('Object')
     configSetTester(body.payload, { name: 'Foo' }, fieldData)
@@ -160,7 +167,7 @@ describe('CONTROLLER TEST : config-set:update', () => {
   it('wrong id', async () => {
     const url = `/config/${new ObjectId()}`
     console.info(`PUT ${url}`)
-    const { body } = await request(app).put(url).send({})
+    const { body } = await request(app).put(url).send({}).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.null
   })
@@ -168,19 +175,19 @@ describe('CONTROLLER TEST : config-set:update', () => {
 
 describe('CONTROLLER TEST : config-set:delete', () => {
   beforeEach(async () => {
-    await clearDatabase()
+    await clearDatabase(['users', 'usersessions'])
   })
   it('bad id', async () => {
     const url = '/config/BAD_ID'
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.equal(messages.idNotValid)
   })
   it('wrong id', async () => {
     const url = `/config/${new ObjectId()}`
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.be.null
   })
@@ -193,7 +200,7 @@ describe('CONTROLLER TEST : config-set:delete', () => {
     await ConfigField.insertMany(fields)
     const url = `/config/${doc._id}`
     console.info(`DELETE ${url}`)
-    const { body } = await request(app).delete(url)
+    const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.OK)
     expect(body.payload).to.eql(doc._id.toString())
   })

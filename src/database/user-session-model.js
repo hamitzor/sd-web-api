@@ -18,8 +18,10 @@ const UserSession = mongoose.model('UserSession', UserSessionSchema)
 setInterval(async () => {
   const expiredSessions = await UserSession.find({ expireTime: { $lte: new Date() } }).populate('user')
   for (const session of expiredSessions) {
-    session.user.session = undefined
-    await session.user.save()
+    if (session.user) {
+      session.user.session = undefined
+      await session.user.save()
+    }
     await session.remove()
   }
 }, 1000 * 60)

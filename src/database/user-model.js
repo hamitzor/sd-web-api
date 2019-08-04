@@ -25,6 +25,7 @@ const UserSchema = new Schema({
     required: true,
     enum: ['ADMIN', 'USER']
   },
+  avatar: String,
   session: {
     type: Schema.Types.ObjectId,
     ref: 'UserSession'

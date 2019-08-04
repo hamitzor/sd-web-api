@@ -17,7 +17,6 @@ const bodyParser = require('body-parser')
 const reqMiddleware = require('./express-middlewares/req-middleware')
 const payloadChecker = require('./express-middlewares/payload-checker')
 
-
 app.use(cors({ origin: webAddress, credentials: true }))
 app.enable('trust proxy')
 app.use(cookieParser())
