@@ -103,7 +103,7 @@ exports.deleteAvatar = async (req, res) => {
     handleException(err, res)
   }
 }
-exports.updateUserRole = async (req, res) => {
+exports.changeRole = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }

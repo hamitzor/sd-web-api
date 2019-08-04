@@ -2,7 +2,7 @@ const expect = require('chai').expect
 /* eslint-disable no-undef */
 
 module.exports = (body, status) => {
-  const responseKeys = ['status', 'payload', '_links']
+  const responseKeys = ['status', 'payload']
   expect(body)
     .to.have.all.keys(responseKeys)
   expect(body.status)

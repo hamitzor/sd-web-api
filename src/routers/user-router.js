@@ -10,6 +10,6 @@ router.post('/', controller.create)
 router.put('/:id', allowAuthenticated('id'), controller.update)
 router.delete('/:id', allowAuthenticated('id'), controller.delete)
 router.delete('/:id/avatar', allowAuthenticated('id'), controller.deleteAvatar)
-router.put('/:id/role', allowAdmin('id'), controller.updateUserRole)
+router.put('/:id/role', allowAdmin('id'), controller.changeRole)
 
 module.exports = router

@@ -17,18 +17,24 @@ const addConfigLinks = doc => ({
 
 const addUserLinks = doc => ({
   ...doc,
+  [doc.session ? 'session' : '']: doc.session ? addUserSessionLinks(doc.session) : doc.session,
   _links: {
-    someLink: 'Link'
+    collection: `${rootAddress}/user`,
+    create: `${rootAddress}/user`,
+    self: `${rootAddress}/user/${doc._id}`,
+    deleteAvatar: `${rootAddress}/user/${doc._id}/avatar`,
+    changeRole: `${rootAddress}/user/${doc._id}/role`
   }
 })
-
 const addUserSessionLinks = doc => ({
   ...doc,
   _links: {
-    sessonLink: 'Link'
+    collection: `${rootAddress}/user-session`,
+    create: `${rootAddress}/user-session`,
+    self: `${rootAddress}/user-session/${doc._id}`,
+    logoutWithCookie: `${rootAddress}/user-session`,
   }
 })
-
 const createAvatarLink = filename => `${rootAddress}/static/${config.storage.avatars}/${filename}`
 
 module.exports = { addFieldLinks, addConfigLinks, addUserLinks, addUserSessionLinks, createAvatarLink }

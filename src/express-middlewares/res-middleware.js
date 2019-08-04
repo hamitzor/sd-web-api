@@ -4,9 +4,9 @@ const config = require('../../app.config')
 
 module.exports = () => (req, res, next) => {
   Object.keys(status.web).forEach(code => {
-    res[changeCase.camelCase(code)] = (payload = {}, _links = {}) => {
+    res[changeCase.camelCase(code)] = (payload = {}) => {
       if (!res.headersSent) {
-        res.json({ status: code, payload, _links }).end()
+        res.json({ status: code, payload }).end()
       }
     }
   })
