@@ -1,4 +1,4 @@
 module.exports = {
   idNotValid: 'id is not valid',
-  duplicated: 'Duplicated field'
+  duplicated: 'duplicated field'
 }

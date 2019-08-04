@@ -14,7 +14,7 @@ module.exports = (err, res) => {
           res.badRequest(messages.duplicated)
           break
         default:
-          res.internalServerError()
+          res.internalServerError(err)
       }
       break
     default:

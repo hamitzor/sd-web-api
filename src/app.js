@@ -15,14 +15,16 @@ const rootRouter = require('./routers')
 const resMiddleware = require('./express-middlewares/res-middleware')
 const bodyParser = require('body-parser')
 const reqMiddleware = require('./express-middlewares/req-middleware')
+const payloadChecker = require('./express-middlewares/payload-checker')
 
 
 app.use(cors({ origin: webAddress, credentials: true }))
 app.enable('trust proxy')
 app.use(cookieParser())
+app.use(reqMiddleware())
 app.use(resMiddleware())
 app.use(bodyParser.json())
-app.use(reqMiddleware())
+app.use(payloadChecker())
 app.use(rootRouter)
 
 module.exports = app

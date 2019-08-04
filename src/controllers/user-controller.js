@@ -2,15 +2,15 @@
  * @author thenrerise@gmail.com (Hamit Zor)
  */
 const { ObjectId } = require('mongoose').mongo
-const { ConfigSet } = require('../database/config-set-model')
+const { User } = require('../database/user-model')
 const messages = require('../messages')('config-set-api')
-const { addConfigLinks } = require('../util/links-creators')
+const { addUserLinks } = require('../util/links-creators')
 const handleException = require('../util/handle-controller-exception')
 
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (_, res) => {
   try {
-    res.ok((await ConfigSet.find().populate('fields')).map(doc => addConfigLinks(doc.toObject())))
+    res.ok((await User.find().populate('session')).map(doc => addUserLinks({ ...doc.toObject(), pwd: undefined })))
   }
   catch (err) {
     handleException(err, res)
@@ -20,8 +20,8 @@ exports.get = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
-    const doc = await ConfigSet.findById(id).populate('fields')
-    res.ok(doc ? addConfigLinks(doc.toObject()) : doc)
+    const doc = await User.findById(id).populate('session')
+    res.ok(doc ? addUserLinks({ ...doc.toObject(), pwd: undefined }) : doc)
   }
   catch (err) {
     handleException(err, res)
@@ -29,8 +29,8 @@ exports.get = async (req, res) => {
 }
 exports.create = async (req, res) => {
   try {
-    const { name } = req.body
-    res.ok(addConfigLinks((await new ConfigSet({ name }).save()).toObject()))
+    const { name, user, pwd, role } = req.body
+    res.ok(addUserLinks({ ... (await new User({ name, user, pwd, role }).save()).toObject(), pwd: undefined }))
   }
   catch (err) {
     handleException(err, res)
@@ -40,9 +40,9 @@ exports.update = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
-    const { name } = req.body
-    const doc = await ConfigSet.findByIdAndUpdate(id, { [name ? "name" : ""]: name }, { new: true, runValidators: true }).populate('fields')
-    res.ok(doc ? addConfigLinks(doc.toObject()) : doc)
+    const { name, pwd, role } = req.body
+    const doc = await User.findByIdAndUpdate(id, { [name ? 'name' : '']: name, [pwd ? 'pwd' : '']: pwd, [role ? 'role' : '']: role }, { new: true, runValidators: true }).populate('session')
+    res.ok(doc ? addUserLinks({ ...doc.toObject(), pwd: undefined }) : doc)
   }
   catch (err) {
     handleException(err, res)
@@ -52,7 +52,7 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
-    const doc = await ConfigSet.deleteOne({ _id: id })
+    const doc = await User.deleteOne({ _id: id })
     res.ok(doc.deletedCount > 0 ? id : null)
   }
   catch (err) {

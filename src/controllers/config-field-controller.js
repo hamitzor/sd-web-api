@@ -1,7 +1,6 @@
 /**
  * @author thenrerise@gmail.com (Hamit Zor)
  */
-//const logger = require('../util/logger')
 const { ObjectId } = require('mongoose').mongo
 const { ConfigSet } = require('../database/config-set-model')
 const { ConfigField } = require('../database/config-field-model')
