@@ -5,9 +5,10 @@ const { allowAdmin, allowAuthenticated } = require('../express-middlewares/allow
 const router = express.Router()
 
 router.get('/', allowAdmin(), controller.getAll)
+router.get('/with-cookie', allowAuthenticated(), controller.getWithCookie)
 router.get('/:id', allowAdmin(), controller.get)
 router.post('/', controller.create)
+router.delete('/with-cookie', allowAuthenticated(), controller.deleteWithCookie)
 router.delete('/:id', allowAdmin(), controller.delete)
-router.delete('/', allowAuthenticated(), controller.deleteWithCookie)
 
 module.exports = router

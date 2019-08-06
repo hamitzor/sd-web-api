@@ -32,7 +32,7 @@ const addUserSessionLinks = doc => ({
     collection: `${rootAddress}/user-session`,
     create: `${rootAddress}/user-session`,
     self: `${rootAddress}/user-session/${doc._id}`,
-    logoutWithCookie: `${rootAddress}/user-session`,
+    withCookie: `${rootAddress}/user-session/with-cookie`
   }
 })
 const createAvatarLink = filename => `${rootAddress}/static/${config.storage.avatars}/${filename}`

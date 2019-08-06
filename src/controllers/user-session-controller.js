@@ -57,12 +57,22 @@ exports.create = async (req, res) => {
     userDoc.session = session._id
     userDoc.save()
     res.setSessionCookie(session._id)
-    res.ok(addUserSessionLinks(session.toObject()))
+    res.ok(addUserSessionLinks({ ...session.toObject(), user: { ...userDoc.toObject(), pwd: undefined } }))
   }
   catch (err) {
     handleException(err, res)
   }
 }
+exports.getWithCookie = async (req, res) => {
+  try {
+    const session = (await UserSession.findById(req.user.session)).toObject()
+    res.ok(addUserSessionLinks({ ...session, user: { ...req.user.toObject(), pwd: undefined } }))
+  }
+  catch (err) {
+    handleException(err, res)
+  }
+}
+
 exports.deleteWithCookie = async (req, res) => {
   try {
     const id = req.getSessionCookie()
