@@ -15,8 +15,8 @@ const staticRouter = express.static(config.storage.root)
 router.use('/static', staticRouter)
 router.use('/config', allowAdmin(), configSetRouter)
 router.use('/config-field', allowAdmin(), configFieldRouter)
-router.use('/user', responseDelayer(1000), userRouter)
-router.use('/user-session', responseDelayer(1000), userSessionRouter)
+router.use('/user', /*responseDelayer(1000),*/ userRouter)
+router.use('/user-session', /*responseDelayer(1000),*/ userSessionRouter)
 router.all('*', errorRouter)
 
 module.exports = router
