@@ -11,6 +11,6 @@ module.exports = () => (req, res, next) => {
     }
   })
   res.clearSessionCookie = () => res.clearCookie(config.auth.cookie)
-  res.setSessionCookie = id => res.cookie(config.auth.cookie, id, { maxAge: config.auth.ttl, httpOnly: true, domain: 'localhost' })
+  res.setSessionCookie = id => res.cookie(config.auth.cookie, id, { maxAge: config.auth.ttl, httpOnly: true, domain: config.hostname })
   next()
 }

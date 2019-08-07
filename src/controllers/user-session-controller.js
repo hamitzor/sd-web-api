@@ -65,8 +65,8 @@ exports.create = async (req, res) => {
 }
 exports.getWithCookie = async (req, res) => {
   try {
-    const session = (await UserSession.findById(req.user.session)).toObject()
-    res.ok(addUserSessionLinks({ ...session, user: { ...req.user.toObject(), pwd: undefined } }))
+    const session = await UserSession.findById(req.user.session)
+    res.ok(session ? addUserSessionLinks({ ...session.toObject(), user: { ...req.user.toObject(), pwd: undefined } }) : session)
   }
   catch (err) {
     handleException(err, res)
