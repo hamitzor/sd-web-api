@@ -5,6 +5,8 @@ const ConfigSetSchema = new Schema({
   name: {
     type: String,
     trim: true,
+    index: true,
+    unique: true,
     required: true
   },
   fields: [{ type: Schema.Types.ObjectId, ref: 'ConfigField' }]

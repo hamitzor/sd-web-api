@@ -3,8 +3,8 @@ const controller = require('../controllers/config-field-controller')
 
 const router = express.Router()
 
-router.post('/:configSetId', controller.createField)
-router.put('/:id', controller.updateField)
-router.delete('/:id', controller.deleteField)
+router.post('/:configSetId', controller.create)
+router.put('/:id', controller.update)
+router.delete('/:id', controller.delete)
 
 module.exports = router

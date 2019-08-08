@@ -12,11 +12,13 @@ const router = express.Router()
 
 const staticRouter = express.static(config.storage.root)
 
-router.use('/static', staticRouter)
-router.use('/config', allowAdmin(), configSetRouter)
-router.use('/config-field', allowAdmin(), configFieldRouter)
-router.use('/user', /*responseDelayer(1000),*/ userRouter)
-router.use('/user-session', /*responseDelayer(1000),*/ userSessionRouter)
+const delay = 1000
+
+router.use('/static', responseDelayer(delay), staticRouter)
+router.use('/config', [allowAdmin(), responseDelayer(delay)], configSetRouter)
+router.use('/config-field', [allowAdmin(), responseDelayer(delay)], configFieldRouter)
+router.use('/user', responseDelayer(delay), userRouter)
+router.use('/user-session', responseDelayer(delay), userSessionRouter)
 router.all('*', errorRouter)
 
 module.exports = router

@@ -8,7 +8,7 @@ const messages = require('../messages')('config-set-api')
 const { addFieldLinks } = require('../util/links-creators')
 const handleException = require('../util/handle-controller-exception')
 
-exports.createField = async (req, res) => {
+exports.create = async (req, res) => {
   try {
     const { configSetId } = req.params
     if (!ObjectId.isValid(configSetId)) { res.badRequest(messages.configSetIdNotValid); return }
@@ -22,7 +22,7 @@ exports.createField = async (req, res) => {
     handleException(err, res)
   }
 }
-exports.updateField = async (req, res) => {
+exports.update = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
@@ -34,7 +34,7 @@ exports.updateField = async (req, res) => {
     handleException(err, res)
   }
 }
-exports.deleteField = async (req, res) => {
+exports.delete = async (req, res) => {
   try {
     const { id } = req.params
     if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
