@@ -4,7 +4,9 @@
 const { ObjectId } = require('mongoose').mongo
 const { User } = require('../database/user-model')
 const { UserSession } = require('../database/user-session-model')
-const messages = require('../messages')('config-set-api')
+const {
+  INVALID,
+} = require('../../error-codes')
 const { addUserSessionLinks } = require('../util/links-creators')
 const handleException = require('../util/handle-controller-exception')
 const config = require('../../app.config')
@@ -23,7 +25,7 @@ exports.getAll = async (_, res) => {
 exports.get = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await UserSession.findById(id).populate('user')
     if (!doc) { res.notFound(); return }
     const obj = doc.toObject()
@@ -36,7 +38,7 @@ exports.get = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await UserSession.findByIdAndDelete(id).populate('user')
     if (!doc) { res.notFound(); return }
     doc.user.session = undefined
@@ -76,7 +78,7 @@ exports.getWithCookie = async (req, res) => {
 exports.deleteWithCookie = async (req, res) => {
   try {
     const id = req.getSessionCookie()
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await UserSession.findByIdAndDelete(id).populate('user')
     if (!doc) { res.notFound(); return }
     doc.user.session = undefined

@@ -1,9 +1,22 @@
-const messages = require('../messages')('config-set-api')
+const {
+  DUPLICATED,
+  EMPTY,
+} = require('../../error-codes')
 
-module.exports = (err, res) => {
+const mongoErrorToApiError = {
+  required: EMPTY
+}
+
+module.exports = (err, res, collection = null) => {
   switch (err.name) {
     case 'ValidationError':
-      res.badRequest(Object.keys(err.errors).map(key => ({ field: key, message: err.errors[key].message })))
+      res.badRequest(Object.keys(err.errors).reduce((acc, key) => {
+        const error = err.errors[key]
+        return {
+          ...acc,
+          [key]: mongoErrorToApiError[error.kind]
+        }
+      }, {}))
       break
     case 'MongoError':
       switch (err.code) {
@@ -11,7 +24,14 @@ module.exports = (err, res) => {
           res.notFound()
           break
         case 11000:
-          res.badRequest(messages.duplicated)
+          if (collection) {
+            collection.getIndexes({ full: true }).then(indexes => {
+              res.badRequest({ [Object.keys((indexes.filter(index => index.name === err.errmsg.match(/index: (.+) dup key:/)[1]))[0].key)[0]]: DUPLICATED })
+            })
+          }
+          else {
+            res.badRequest(DUPLICATED)
+          }
           break
         default:
           res.internalServerError(err)

@@ -1,0 +1,6 @@
+module.exports = {
+  INVALID: 'INVALID',
+  WRONG: 'WRONG',
+  EMPTY: 'EMPTY',
+  DUPLICATED: 'DUPLICATED'
+}

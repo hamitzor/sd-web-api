@@ -3,7 +3,9 @@
  */
 const { ObjectId } = require('mongoose').mongo
 const { User } = require('../database/user-model')
-const messages = require('../messages')('config-set-api')
+const {
+  INVALID,
+} = require('../../error-codes')
 const { addUserLinks, createAvatarLink } = require('../util/links-creators')
 const handleException = require('../util/handle-controller-exception')
 const avatarUploader = require('../util/avatar-uploader')
@@ -24,7 +26,7 @@ exports.getAll = async (_, res) => {
 exports.get = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await User.findById(id).populate('session')
     res.ok(doc ? addUserLinks({ ...doc.toObject(), pwd: undefined }) : doc)
   }
@@ -61,7 +63,7 @@ exports.update = async (req, res) => {
     else {
       try {
         const { id } = req.params
-        if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+        if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
         const avatar = req.file
         const { name, pwd } = req.body
         const doc = await User.findByIdAndUpdate(id, { [name ? 'name' : '']: name, [pwd ? 'pwd' : '']: pwd, [avatar ? 'avatar' : '']: avatar ? createAvatarLink(avatar.filename) : undefined }, { new: true, runValidators: true }).populate('session')
@@ -76,7 +78,7 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await User.findByIdAndDelete(id)
     res.ok(doc ? id : null)
     if (doc.avatar) {
@@ -91,7 +93,7 @@ exports.delete = async (req, res) => {
 exports.deleteAvatar = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await User.findByIdAndUpdate(id, { avatar: undefined }, { runValidators: true })
     res.ok()
     if (doc.avatar) {
@@ -106,7 +108,7 @@ exports.deleteAvatar = async (req, res) => {
 exports.changeRole = async (req, res) => {
   try {
     const { id } = req.params
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const { role } = req.body
     const doc = await User.findByIdAndUpdate(id, { role }, { new: true, runValidators: true }).populate('session')
     res.ok(doc ? addUserLinks({ ...doc.toObject(), pwd: undefined }) : doc)

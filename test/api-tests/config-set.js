@@ -7,7 +7,9 @@ const responseTester = require('../util/response-tester')
 const configSetTester = require('../util/config-set-tester')
 const { ObjectId } = require('mongoose').mongo
 const status = require('../../status-codes')
-const messages = require('../../src/messages')('config-set-api')
+const {
+  INVALID,
+} = require('../../error-codes')
 
 
 const app = require('../../src/app')
@@ -79,7 +81,7 @@ describe('CONTROLLER TEST : config-set:get', () => {
     console.info(`GET ${url}`)
     const { body } = await request(app).get(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.idNotValid)
+    expect(body.payload).to.equal(INVALID)
   })
   it('wrong id', async () => {
     const url = `/config/${new ObjectId()}`
@@ -182,7 +184,7 @@ describe('CONTROLLER TEST : config-set:delete', () => {
     console.info(`DELETE ${url}`)
     const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.idNotValid)
+    expect(body.payload).to.equal(INVALID)
   })
   it('wrong id', async () => {
     const url = `/config/${new ObjectId()}`

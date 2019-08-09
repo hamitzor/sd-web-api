@@ -1,6 +1,8 @@
 const { ObjectId } = require('mongoose').mongo
 const { UserSession } = require('../database/user-session-model')
-const messages = require('../messages')('config-set-api')
+const {
+  INVALID,
+} = require('../../error-codes')
 const config = require('../../app.config')
 const handleException = require('../util/handle-controller-exception')
 
@@ -8,7 +10,7 @@ const allowRoles = (roles, checkId) => async (req, res, next) => {
   try {
     const id = req.getSessionCookie()
     if (!id) { res.forbidden(); return }
-    if (!ObjectId.isValid(id)) { res.badRequest(messages.idNotValid); return }
+    if (!ObjectId.isValid(id)) { res.badRequest({ id: INVALID }); return }
     const doc = await UserSession.findByIdAndUpdate(id, { expireTime: new Date(Date.now() + config.auth.ttl) }, { new: true, runValidators: true }).populate('user')
     if (!doc || !doc.user) { res.forbidden(); return }
     if (!Array.isArray(roles)) {

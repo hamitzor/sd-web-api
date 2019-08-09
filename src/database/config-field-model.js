@@ -1,11 +1,13 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const { ConfigSet } = require('./config-set-model')
-const messages = require('../messages')('config-field-api')
+const {
+  WRONG,
+} = require('../../error-codes')
 
 const configSetValidate = {
   validator: async configSetId => await ConfigSet.findById(configSetId) ? true : false,
-  message: messages.wrongConfigSetId
+  message: WRONG
 }
 
 const ConfigFieldSchema = new Schema({

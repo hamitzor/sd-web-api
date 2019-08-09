@@ -7,7 +7,11 @@ const responseTester = require('../util/response-tester')
 const configFieldTester = require('../util/config-field-tester')
 const { ObjectId } = require('mongoose').mongo
 const status = require('../../status-codes')
-const messages = require('../../src/messages')('config-field-api')
+const {
+  INVALID,
+  WRONG,
+  DUPLICATED
+} = require('../../error-codes')
 
 
 const app = require('../../src/app')
@@ -40,7 +44,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     responseTester(body, status.web.BAD_REQUEST)
     expect(body.payload).to.eql([{
       field: 'configSet',
-      message: messages.wrongConfigSetId
+      message: WRONG
     }])
   })
   it('full request', async () => {
@@ -108,7 +112,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     console.info(`POST ${url}`)
     const { body } = await request(app).post(url).send({ key: '1', value: 'aValue' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.duplicated)
+    expect(body.payload).to.equal(DUPLICATED)
   })
   it('duplicated key, empty value', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -121,7 +125,7 @@ describe('CONTROLLER TEST : config-field:createField', () => {
     console.info(`POST ${url}`)
     const { body } = await request(app).post(url).send({ key: '1', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.duplicated)
+    expect(body.payload).to.equal(DUPLICATED)
   })
 })
 
@@ -212,7 +216,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     console.info(`PUT ${url}`)
     const { body } = await request(app).put(url).send({ key: '1', value: 'updatedValue' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.duplicated)
+    expect(body.payload).to.equal(DUPLICATED)
   })
   it('duplicated key, empty value', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
@@ -225,7 +229,7 @@ describe('CONTROLLER TEST : config-field:updateField', () => {
     console.info(`PUT ${url}`)
     const { body } = await request(app).put(url).send({ key: '1', value: '' }).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.duplicated)
+    expect(body.payload).to.equal(DUPLICATED)
   })
 })
 
@@ -247,7 +251,7 @@ describe('CONTROLLER TEST : config-field:deleteField', () => {
     console.info(`DELETE ${url}`)
     const { body } = await request(app).delete(url).set('Cookie', [cookie])
     responseTester(body, status.web.BAD_REQUEST)
-    expect(body.payload).to.equal(messages.idNotValid)
+    expect(body.payload).to.equal(INVALID)
   })
   it('wrong id', async () => {
     const doc = new ConfigSet({ name: 'Foo' })
